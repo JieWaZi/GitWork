@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC   
+	    "-//mybatis.org//DTD Mapper 3.0//EN"  
+	    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	    
+<mapper namespace="com.secsc.mapper.PreProccessMapper">
+
+
+
+	<select id="getPreProcessRecords"  resultType="PreProcessRecord">
+		select * from preprocess_records order by preProccessDateTime DESC limit 0,5
+	</select>
+
+
+	<insert id="insertPreProcessRecord" parameterType="PreProcessRecord">
+	
+		insert into preprocess_records values  
+		(#{record.uuid},#{record.preProccessMethod},#{record.datasource},#{record.preProccessDateTime},
+		#{record.userName},#{record.preProccessStatus})
+		
+	</insert>
+	
+	
+	<update id="updatePreprocessStatus" parameterType="PreProcessRecord">
+	
+		update preprocess_records set preProccessStatus=#{record.preProccessStatus} where uuid=#{record.uuid}
+	
+	</update>
+	
+	
+	<select id="queryRecordByUUID" parameterType="String"  resultType="PreProcessRecord">
+	
+		select * from preprocess_records where uuid=#{uuid}
+		
+	</select>
+
+
+	<select id="queryRecordsByMethod"  resultType="PreProcessRecord">
+		
+		select * from preprocess_records where preProccessMethod=#{method} order by preProccessDateTime DESC limit 0,1
+	
+	</select>
+
+</mapper>

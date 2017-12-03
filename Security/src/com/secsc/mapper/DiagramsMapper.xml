@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC   
+	    "-//mybatis.org//DTD Mapper 3.0//EN"  
+	    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	    
+<mapper namespace="com.secsc.mapper.DiagramsMapper">
+
+	
+	<select id="getDiagrams"  resultType="Diagram">
+		select * from  diagrams
+	</select>
+	
+	<select id="getDiagramById"  parameterType="String" resultType="Diagram">
+		select * from diagrams where uuid=#{uuid}
+	</select>
+	
+	<insert id="insertDiagram" parameterType="Diagram">
+	
+	    insert into diagrams values(#{diagram.uuid},#{diagram.title},#{diagram.type},#{diagram.datasourceUuid})
+	
+	</insert>
+
+
+
+</mapper>

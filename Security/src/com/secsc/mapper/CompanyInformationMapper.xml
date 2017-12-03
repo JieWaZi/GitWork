@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC   
+	    "-//mybatis.org//DTD Mapper 3.0//EN"  
+	    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	    
+<mapper namespace="com.secsc.mapper.CompanyInformationMapper">
+
+	<insert id="insertCompanyInformation" parameterType="java.util.List">
+	
+	insert into company_information values
+	  <foreach collection="list" item="item" index="index" separator="," >  
+        (#{item.companyName},#{item.legalPersonCode},#{item.industrySort},#{item.industrySmall},
+        #{item.address},#{item.gps},#{item.logoUrl},#{item.regionAndCity},#{item.accountNumber})  
+    </foreach> 
+	
+	</insert>
+	
+	
+	<insert id="insertCompanyDetail" parameterType="java.util.List">
+	
+	insert into company_detail values
+	  <foreach collection="list" item="item" index="index" separator="," >  
+        (#{item.legalPersonCode},#{item.years},#{item.industrialOutput},#{item.salesRevenue},
+        #{item.payTaxes},#{item.employees},#{item.energyManager},#{item.eceQuivalent},#{item.eceQuivalence},
+        #{item.productionCosts},#{item.energyCost},#{item.consumptionRatio},#{item.unitOuputEquivalent},#{item.unitOuputEquivalence},
+        #{item.outputCost},#{item.energyComsumptionPUoIAV},#{item.processUuid},#{item.preProcessMethod})  
+    </foreach> 
+	
+	</insert>
+	
+	<select id="getCompanyName"  resultType="String">
+		select companyName from clustering_results where clustering_batch_ID=#{uuid}
+	</select>
+	
+	<select id="getIndustrySort"  resultType="String">
+		select industrySort from company_information where companyName=#{companyname}
+	</select>
+
+
+
+</mapper>

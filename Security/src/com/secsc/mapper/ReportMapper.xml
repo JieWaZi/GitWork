@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC   
+	    "-//mybatis.org//DTD Mapper 3.0//EN"  
+	    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	    
+<mapper namespace="com.secsc.mapper.ReportMapper">
+
+
+
+	<select id="getReports"  resultType="Report">
+		select * from reports order by generateDateTime DESC limit 0,5
+	</select>
+	
+	<select id="getReportByIndustrySort" parameterType="String"  resultType="Report">
+		select * from reports  where industrySort=#{industrySort}  order by generateDateTime DESC limit 0,5
+	</select>
+	
+	<select id="getReportByUuid" parameterType="String"  resultType="Report">
+		select * from reports  where uuid=#{uuid}
+	</select>
+	
+
+	
+	<insert id="insertReport" parameterType="Report">
+	
+		insert into reports values  
+		(#{report.uuid},#{report.title},#{report.texts},#{report.generateDateTime},
+		#{report.industrySort},#{report.username},#{report.diagramUuid})
+		
+	</insert>
+	
+
+</mapper>

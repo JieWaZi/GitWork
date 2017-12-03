@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC   
+	    "-//mybatis.org//DTD Mapper 3.0//EN"  
+	    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	    
+<mapper namespace="com.secsc.mapper.DataAnalysisMapper">
+
+
+
+	<select id="getDataAnalysisRecords"  resultType="DataAnalysisRecord">
+		select * from data_analysis_record where 1=1
+		<if test="method!=null">
+		 and analysisMethod=#{method} 
+		</if>
+		 order by jobDateTime DESC limit 0,5
+	</select>
+	
+
+	<insert id="insertDataAnalysisRecord" parameterType="DataAnalysisRecord">
+	
+		insert into data_analysis_record values  
+		(#{record.uuid},#{record.jobDateTime},#{record.analysisMethod},#{record.arithmetic}
+		,#{record.preprocessUUID},#{record.industrySort},#{record.username})
+		
+	</insert>
+	
+
+</mapper>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC   
+	    "-//mybatis.org//DTD Mapper 3.0//EN"  
+	    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	    
+<mapper namespace="com.secsc.mapper.UploadMapper">
+
+
+<insert id="insertUploadRecord" parameterType="UploadRecord" >
+
+	insert into upload_records 
+	values(#{upload.uuid},#{upload.originalName},#{upload.fileType},#{upload.filePath},#{upload.fileSize},#{upload.uploadDateTime},#{upload.username},#{upload.uploadTarget})
+	
+</insert>
+
+<select id="getUploadRecords" parameterType="UploadRecord" resultType="UploadRecord">
+	
+	select * from upload_records where username=#{upload.username} 
+	and uploadTarget=#{upload.uploadTarget} order by uploadDateTime DESC limit 0,5
+	
+</select>
+
+<select id="getRecordByID" parameterType="String" resultType="UploadRecord">
+	
+	select * from upload_records where uuid=#{uuid}
+	
+</select>
+
+
+</mapper>
