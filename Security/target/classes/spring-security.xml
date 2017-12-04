@@ -9,6 +9,7 @@
 	http://www.springframework.org/schema/security/spring-security-4.2.xsd 
 	">
 	
+	<!-- 导入这个是因为security和mybatis整合会报找不到mapper，导入以后发现问题解决很神奇 -->
 	<beans:import resource="applicationContext.xml"/>
 	
 	<http pattern="/js/**" security="none"></http>
@@ -27,7 +28,8 @@
 	</http>
 	<authentication-manager alias="authenticationManager">
 		<authentication-provider ref="authenticationProvider">
-<!-- 			 <password-encoder hash="md5">  
+<!-- 		由于是自己重新定义的	 authenticationProvider所以不能在这里配置加密和盐值
+			<password-encoder hash="md5">  
          		将每个用户的username作为盐值  
          		<salt-source user-property="username"/>  
 		     </password-encoder> -->
@@ -39,10 +41,7 @@
 		<beans:property name="dataSource" ref="myDataSource1" />
 	</beans:bean>
 	
-	<beans:bean id="authenticationSuccessHandler" class="com.secsc.handler.AuthenticationSuccessHandler">
-	</beans:bean>
-	
-	
+	<!-- 数据源  这里有个问题，在applicationContext已经配置了不知为何不能引用 -->
 	<beans:bean id="myDataSource1" class="org.apache.commons.dbcp.BasicDataSource">	
 		<beans:property name="driverClassName" value="com.mysql.jdbc.Driver" />
 		<beans:property name="url" value="jdbc:mysql://localhost:3306/secsc?useUnicode=true&amp;characterEncoding=utf-8" />
@@ -51,6 +50,8 @@
 	</beans:bean>
 
 
+
+	<!-- 自己重新设置DaoAuthenticationProvider -->
 	<beans:bean id="authenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">  
 	    <beans:property name="hideUserNotFoundExceptions" value="false" />  
 	    <beans:property name="userDetailsService" ref="userDetailsService" />   
