@@ -27,7 +27,7 @@
 		<csrf disabled="true"/>
 	</http>
 	<authentication-manager alias="authenticationManager">
-		<authentication-provider ref="authenticationProvider">
+		<authentication-provider ref="customAuthenticationProvider">
 <!-- 		由于是自己重新定义的	 authenticationProvider所以不能在这里配置加密和盐值
 			<password-encoder hash="md5">  
          		将每个用户的username作为盐值  
@@ -52,9 +52,9 @@
 
 
 	<!-- 自己重新设置DaoAuthenticationProvider -->
-	<beans:bean id="authenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">  
+	<beans:bean id="customAuthenticationProvider" class="com.secsc.security.service.CustomAuthenticationProvider">  
 	    <beans:property name="hideUserNotFoundExceptions" value="false" />  
-	    <beans:property name="userDetailsService" ref="userDetailsService" />   
+	    <beans:property name="userDetailsService" ref="myUserDetailsService" />   
 	    <beans:property name="passwordEncoder" ref="passwordEncode" />  
 	    <beans:property name="saltSource" ref="saltSource" />  
 	</beans:bean> 

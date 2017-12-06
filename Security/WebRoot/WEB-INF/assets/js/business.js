@@ -329,7 +329,7 @@ $(function(){
 			$.each(data, function(i, item) {
 				var uploadDate=item.uploadDateTime;
 				var fileName = item.originalName;
-				targetDiv.append(getRadioInfoBtnTemplet(item.uuid, "datasourceList", item.originalName + "-" + uploadDate.substring(0,10)+" "+uploadDate.substring(11)));
+				targetDiv.append(getRadioInfoBtnTemplet(item.uuid, "datasourceList", item.originalName + "/" + formatDatetimeOfJsonObject(uploadDate)));
 			});
 			regInfoBtnGroup(contentEle, function() {
 				updatePreProccessPara(contentEle);
@@ -815,7 +815,7 @@ $(function(){
 					var container = $("#newReportDataSource").children("div:last");
 					container.empty();
 					$.each(ds, function(i, item) {
-						container.append(getRadioInfoBtnTemplet(item.uuid, "reportDS",item.jobDateTime.substring(0,10)+" "+item.jobDateTime.substring(11)))
+						container.append(getRadioInfoBtnTemplet(item.uuid, "reportDS",formatDatetimeOfJsonObject(item.jobDateTime)))
 						if(i == 0) {
 							container.find("input[type='radio']").attr("checked", "checked");
 						}

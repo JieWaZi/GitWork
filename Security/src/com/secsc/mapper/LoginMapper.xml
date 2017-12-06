@@ -7,7 +7,7 @@
 
 
 
-	<select id="findByPassword" parameterType="String" resultType="User">
+	<select id="findByPassword" parameterType="String" resultType="myUser">
 		select * from users
 		where password=#{password}
 	</select>

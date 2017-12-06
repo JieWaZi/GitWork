@@ -2,10 +2,10 @@ package com.secsc.mapper;
 
 import org.apache.ibatis.annotations.Param;
 
-import com.secsc.entity.User;
+import com.secsc.entity.myUser;
 
 public interface LoginMapper {
 	
-	public User findByPassword(@Param("password")String password);
+	public myUser findByPassword(@Param("password")String password);
 
 }

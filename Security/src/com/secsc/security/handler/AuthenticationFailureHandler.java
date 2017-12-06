@@ -1,4 +1,4 @@
-package com.secsc.handler;
+package com.secsc.security.handler;
 
 import java.io.IOException;
 
@@ -6,6 +6,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
@@ -22,6 +23,8 @@ public class AuthenticationFailureHandler extends SimpleUrlAuthenticationFailure
 		if (isAjax) {
 			if (exception instanceof UsernameNotFoundException) {
 				response.getWriter().print("user not found");
+			}else if (exception instanceof LockedException) {
+				response.getWriter().print("user is locked");
 			}else {
 				response.getWriter().print("failure");
 			}

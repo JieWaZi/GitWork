@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.secsc.entity.DataAnalysisRecord;
 import com.secsc.entity.PreProcessRecord;
-import com.secsc.entity.User;
+import com.secsc.entity.myUser;
 import com.secsc.mapper.DataAnalysisMapper;
 import com.secsc.mapper.PreProccessMapper;
 import com.secsc.security.AuthenticationInfo;
@@ -54,9 +54,8 @@ public class DataAnalysisController {
 		if (method.equals("聚类")) {
 			String uuid=UUID.randomUUID().toString().replaceAll("\\-", "");
 			String username=authenticationInfo.getUserDetails().getUsername();
-			dataAnalysisMapper.insertDataAnalysisRecord(new DataAnalysisRecord(uuid,  LocalDateTime.now(), method,arithmetic, datasourceuuid, "company_details",username));
+			dataAnalysisMapper.insertDataAnalysisRecord(new DataAnalysisRecord(uuid,  LocalDateTime.now(), method,arithmetic, datasourceuuid, "电力、热力生产和供应业",username));
 			try {
-				System.out.println(datasourceuuid+"  "+uuid+"  "+year+"  "+arithmetic+"  "+param);
 				try {
 					SparkCommit.clusteringOperation(jarpath,datasourceuuid, uuid, year, arithmetic, param);
 				} catch (Exception e) {

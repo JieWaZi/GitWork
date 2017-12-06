@@ -1,4 +1,4 @@
-package com.secsc.handler;
+package com.secsc.security.handler;
 import java.io.IOException;
 import java.io.Serializable;
 

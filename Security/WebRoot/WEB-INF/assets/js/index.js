@@ -33,6 +33,9 @@ $(function(){
 		} else if(loginInfo == "user not found") {
 			var status = "<p>登录失败，用户名不存在</p>";
 			statusDiv.html(loginInfoTemplet(status, "danger"));
+		} else if(loginInfo == "user is locked") {
+			var status = "<p>登录失败，用户名已被锁，请联系管理员</p>";
+			statusDiv.html(loginInfoTemplet(status, "danger"));
 		}else {
 			var status = "<p>用户未登录</p>";
 			statusDiv.html(loginInfoTemplet(status, "warning"));

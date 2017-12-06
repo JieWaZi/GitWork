@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC   
+	    "-//mybatis.org//DTD Mapper 3.0//EN"  
+	    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	    
+<mapper namespace="com.secsc.mapper.UserMapper">
+	
+	<select id="getUsers" parameterType="String"  resultType="myUser">
+		select * from users where username=#{username}
+	</select>
+
+	<select id="getAuthorities" parameterType="String"  resultType="String">
+		select authority from authorities where username=#{username}
+	</select>
+	
+	<update id="updateAccountNonLocked"  parameterType="String">
+		update users set accountNonLocked=0 where username=#{username}
+	</update>
+
+</mapper>

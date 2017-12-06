@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.secsc.entity.User;
+import com.secsc.entity.myUser;
 import com.secsc.mapper.LoginMapper;
 import com.secsc.security.AuthenticationInfo;
 import com.secsc.security.AuthenticationInfoImpl;
