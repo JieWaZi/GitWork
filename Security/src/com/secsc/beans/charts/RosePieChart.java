@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import com.github.abel533.echarts.Grid;
 import com.github.abel533.echarts.Option;
 import com.github.abel533.echarts.Tooltip;
 import com.github.abel533.echarts.code.LineType;
@@ -111,6 +112,12 @@ public class RosePieChart extends BaseChart<Map<String, String>> {
 		setLegend(legendName);
 		getTempOption().series(series);
 		return getTempOption();
+	}
+
+	@Override
+	public Option setGrid(Grid grid) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

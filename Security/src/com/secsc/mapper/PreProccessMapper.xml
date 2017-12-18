@@ -16,7 +16,7 @@
 	
 		insert into preprocess_records values  
 		(#{record.uuid},#{record.preProccessMethod},#{record.datasource},#{record.preProccessDateTime},
-		#{record.userName},#{record.preProccessStatus})
+		#{record.userName},#{record.preProccessStatus},#{record.target})
 		
 	</insert>
 	
@@ -35,9 +35,10 @@
 	</select>
 
 
-	<select id="queryRecordsByMethod"  resultType="PreProcessRecord">
+	<select id="queryRecordsByMethod" parameterType="PreProcessRecord"  resultType="PreProcessRecord">
 		
-		select * from preprocess_records where preProccessMethod=#{method} order by preProccessDateTime DESC limit 0,1
+		select * from preprocess_records where preProccessMethod=#{record.preProccessMethod} and target=#{record.target}
+		 order by preProccessDateTime DESC limit 0,1
 	
 	</select>
 

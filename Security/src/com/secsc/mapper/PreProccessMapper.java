@@ -17,6 +17,6 @@ public interface PreProccessMapper {
 	
 	public PreProcessRecord queryRecordByUUID(@Param("uuid")String uuid);
 	
-	public List<PreProcessRecord> queryRecordsByMethod(@Param("method")String method);
+	public List<PreProcessRecord> queryRecordsByMethod(@Param("record")PreProcessRecord record);
 	
 }

@@ -15,5 +15,5 @@ public interface UploadMapper {
 	
 	public List<UploadRecord> getUploadRecords(@Param("upload")UploadRecord uploadRecord);
 	
-	public UploadRecord getRecordByID(@Param("uuid")String uuid);
+	public UploadRecord getRecordByID(@Param("upload")UploadRecord uploadRecord);
 }

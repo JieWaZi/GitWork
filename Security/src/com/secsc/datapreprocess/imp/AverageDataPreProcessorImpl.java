@@ -1,22 +1,11 @@
-/**  
- * @Title AverageDataPreProccessImpl.java
- * @Package com.secsc.beans.dataPreProccess.impl
- * @author Arvin (Arvinsc@foxmail.com)
- * 2017年7月18日
- * File Name: AverageDataPreProccessImpl.java
- * CopyRright (c) 2016: 
- * File No. 
- * Project Name: SECSC
- * @version
- */
-
-package com.secsc.datapreprocess.service;
+package com.secsc.datapreprocess.imp;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.secsc.datapreprocess.service.BaseDataPreprocessor;
 import com.secsc.exception.EmptyListException;
 import com.secsc.exception.IncomputableException;
 
@@ -41,7 +30,7 @@ public class AverageDataPreProcessorImpl<T extends Number>
 	public List<T> doPreProccess(List<T> dataList)
 			throws EmptyListException, IncomputableException {
 		
-		//将列数据的均值去除
+		//将列数据的需要均值的值去除
 		double average = getAverageOfList(dataList);
 		List<T> proccessedList = new ArrayList<T>();
 		for (T t : dataList) {

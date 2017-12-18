@@ -131,7 +131,7 @@
 
 	<div id="outline" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 		<h1 class="page-header">
-			<span style="color:white;">概要</span> <a tabindex="0"
+			<span style="color:white;">总览</span> <a tabindex="0"
 				class="bs-docs-popover" role="button" data-toggle="popover"
 				data-trigger="focus" data-content="Optional tips box"> <span
 				class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
@@ -158,7 +158,7 @@
 			<div id="sideBar" class="col-sm-3 col-md-2 sidebar"
 				style="margin-top:4.6em;background-color: #333;border-right-color: rgba(255, 255, 255, 0.15);">
 				<ul class="nav nav-sidebar" role="tablist" style="margin-top: 1em;">
-					<li class="active"><a role="sideNav" href="#outline" >概要</a><span class="sr-only"></span></li>
+					<li class="active"><a role="sideNav" href="#outline" >总览</a><span class="sr-only"></span></li>
 				    <sec:authorize access="hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')"><li><a role="sideNav" href="#ele-heat">电力、热力生产和供应业</a></li></sec:authorize>
 				</ul>
 			</div>

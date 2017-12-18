@@ -1,40 +1,42 @@
-/**  
- * @Title StackBarChart.java
- * @Package com.secsc.beans.charts
- * @author Arvin (Arvinsc@foxmail.com)
- * 2017年8月14日
- * File Name: StackBarChart.java
- * CopyRright (c) 2016: 
- * File No. 
- * Project Name: SECSC
- * @version
- */
 
 package com.secsc.beans.charts;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.github.abel533.echarts.AxisPointer;
+import com.github.abel533.echarts.Grid;
 import com.github.abel533.echarts.Option;
 import com.github.abel533.echarts.Tooltip;
 import com.github.abel533.echarts.axis.ValueAxis;
 import com.github.abel533.echarts.code.AxisType;
+import com.github.abel533.echarts.code.Orient;
 import com.github.abel533.echarts.code.PointerType;
 import com.github.abel533.echarts.code.Trigger;
+import com.github.abel533.echarts.code.X;
+import com.github.abel533.echarts.code.Y;
 import com.github.abel533.echarts.data.Data;
 import com.github.abel533.echarts.series.Bar;
+import com.secsc.entity.EnergyConsumptionStructure;
 
-/**
- * @ClassName StackBarChart
- * @Description TODO
- * @author Arvin (Arvinsc@foxmail.com)
- * @version 1.0 Build 0000, 2017年8月14日 上午10:28:18, TODO,
- */
 
-public class StackBarChart extends BaseChart<StackEntity> {
+
+public class StackBarChart extends BaseChart<EnergyConsumptionStructure> {
+	
+	private List<String> legends;
+	
+	public StackBarChart() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	public StackBarChart(List<String> legend) {
+		// TODO Auto-generated constructor stub
+		this.legends=legend;
+	}
 
 	@Override
 	public Option initChart(String title) {
@@ -68,7 +70,7 @@ public class StackBarChart extends BaseChart<StackEntity> {
 		xAxis.setType(AxisType.value);
 		ValueAxis yAxis = new ValueAxis();
 		yAxis.setType(AxisType.category);
-
+		
 		option.xAxis(xAxis);
 		option.yAxis(yAxis);
 
@@ -81,37 +83,81 @@ public class StackBarChart extends BaseChart<StackEntity> {
 	 * @see com.secsc.beans.charts.Chart#setSeriesWithEntity(java.util.List)
 	 */
 	@Override
-	public Option setSeriesWithEntity(List<StackEntity> entities) {
+	public Option setSeriesWithEntity(List<EnergyConsumptionStructure> entities) {
 
-		DecimalFormat format = new DecimalFormat("#.###");
+		DecimalFormat format = new DecimalFormat("#.##");
 		Option option = getTempOption();
-		Set<String> attributesKeys = entities.get(0).getAttributes().keySet();
-		option.yAxis().get(0).setData(new ArrayList<String>(attributesKeys));
-
-		for (StackEntity stackBarEntity : entities) {
-			Set<String> keys = stackBarEntity.getAttributes().keySet();
-			setLegend(stackBarEntity.getName());
-			Bar bar = new Bar();
-			bar.stack(stackBarEntity.getStackName());
-			bar.name(stackBarEntity.getName());
-			List<Data> datas = new ArrayList<Data>();
-
-			int index = 0;
-			for (String key : keys) {
-				Data data = new Data();
-				data.name(key);
-				data.value(
-						format.format(stackBarEntity.getAttributes().get(key)));
-				// single block color not support now
-				// data.itemStyle().normal().color(_getColor(index++));
-				datas.add(data);
-			}
-			// bar.label().normal().show(true);
-			bar.setData(datas);
+		List<Integer> years=new ArrayList<Integer>();
+		List<String> cowCoals=new ArrayList<String>();
+		List<String> commonCoals=new ArrayList<String>();
+		List<String> heatingPowers=new ArrayList<String>();
+		List<String> electricPowers=new ArrayList<String>();
+		List<String> naturalGass=new ArrayList<String>();
+		List<String> crudes=new ArrayList<String>();
+		List<String> gasolines=new ArrayList<String>();
+		Map<String, ArrayList<String>> map=new HashMap<String, ArrayList<String>>();
+		if (legends==null) {
+			legends=new ArrayList<String>();
+			legends.add("原煤(吨)");
+			legends.add("一般烟煤(吨)");
+			legends.add("热力(百万千焦)");
+			legends.add("电力(万千瓦时)");
+			legends.add("天然气(气态)(万立方米)");
+			legends.add("原油(吨)");
+			legends.add("气油(吨)");
+			setLegend(legends);
+		}else {
+			setLegend(legends);
+		}
+		option.getLegend().setTop("23px");
+		option.getLegend().setX(X.center);
+		option.getLegend().setY(Y.top);
+		option.getLegend().setOrient(Orient.horizontal);
+		for (EnergyConsumptionStructure ecs : entities) {
+			years.add(ecs.getYears());
+			cowCoals.add(format.format(ecs.getRowCoal()));
+			commonCoals.add(format.format(ecs.getCommonCoal()));
+			heatingPowers.add(format.format(ecs.getHeatingPower()));
+			electricPowers.add(format.format(ecs.getElectricPower()));
+			naturalGass.add(format.format(ecs.getNaturalGas()));
+			crudes.add(format.format(ecs.getCrude()));
+			gasolines.add(format.format(ecs.getGasoline()));
+		}
+		option.yAxis().get(0).setData(years);
+		map.put("原煤(吨)", (ArrayList<String>) cowCoals);
+		map.put("一般烟煤(吨)", (ArrayList<String>) commonCoals);
+		map.put("热力(百万千焦)", (ArrayList<String>) heatingPowers);
+		map.put("电力(万千瓦时)", (ArrayList<String>) electricPowers);
+		map.put("天然气(气态)(万立方米)", (ArrayList<String>) naturalGass);
+		map.put("原油(吨)", (ArrayList<String>) crudes);
+		map.put("气油(吨)", (ArrayList<String>) gasolines);
+		
+		for (int i=0;i<legends.size();i++) {
+			Bar bar=new Bar();
+			bar.setName(legends.get(i));
+			bar.stack("当年总量");
+			bar.setData(map.get(legends.get(i)));
 			option.series(bar);
 		}
-
 		return option;
 	}
 
+	public List<String> getLegends() {
+		return legends;
+	}
+
+	public void setLegends(List<String> legends) {
+		this.legends = legends;
+	}
+
+	@Override
+	public Option setGrid(Grid grid) {
+		// TODO Auto-generated method stub
+		
+		Option option=getTempOption();
+		option.setGrid(grid);
+		return option;
+	}
+	
+	
 }

@@ -123,7 +123,8 @@ public class CompanyBusinessDetailsExcelDataSourceMapper
 				throw new ContentNOTSatisifiedReqException("关键字段“年份”的数据不符合要求！");
 			} else if ("".equals(companyDetail.getLegalPersonCode())
 					|| companyDetail.getLegalPersonCode() == null
-					|| companyDetail.getLegalPersonCode().length() != 9) {
+					|| (companyDetail.getLegalPersonCode().length() != 9
+					&& companyDetail.getLegalPersonCode().length() != 8)) {
 				throw new ContentNOTSatisifiedReqException(
 						"关键字段“法人代码”的数据不符合要求！");
 			}

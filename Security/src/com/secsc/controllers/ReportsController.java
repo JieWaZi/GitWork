@@ -77,6 +77,9 @@ public class ReportsController {
 		case "elec-heat":
 			report.setIndustrySort("电力、热力生产和供应业");
 			break;
+		case "pandect":
+			report.setIndustrySort("总览");
+			break;
 		default:
 			report.setIndustrySort("");
 			break;
@@ -86,7 +89,9 @@ public class ReportsController {
 		case "聚类":
 			diagram.setDiagramType("ClusterScatterChart");
 			break;
-
+		case "统计":
+			diagram.setDiagramType("BarChart");
+			break;
 		default:
 			diagram.setDiagramType("");
 			break;

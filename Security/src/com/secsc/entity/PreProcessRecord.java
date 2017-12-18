@@ -1,25 +1,9 @@
-/**  
- * @Title PreProccessRecord.java
- * @Package com.secsc.beans.dataPreProccess
- * @author Arvin (Arvinsc@foxmail.com)
- * 2017年7月19日
- * File Name: PreProccessRecord.java
- * CopyRright (c) 2016: 
- * File No. 
- * Project Name: SECSC
- * @version
- */
-
 package com.secsc.entity;
 
 import java.time.LocalDateTime;
 
 
-/**
- * @ClassName PreProccessRecord
- * @author Arvin (Arvinsc@foxmail.com)
- * @version 1.0 Build 0000, 2017年7月19日 上午10:31:12,
- */
+
 
 public class PreProcessRecord {
 	private String uuid;
@@ -28,6 +12,7 @@ public class PreProcessRecord {
 	private LocalDateTime preProccessDateTime;
 	private String userName;
 	private String preProccessStatus;
+	private String target;
 
 	/**
 	 * @Description
@@ -43,21 +28,22 @@ public class PreProcessRecord {
 	 * @param preproccessDateTime
 	 * @param username
 	 */
-	public PreProcessRecord(String uuid, String preProccessMethod,
-			String datasource, LocalDateTime preProccessDateTime,
-			String userName, String status) {
+	public PreProcessRecord(String uuid, String preProccessMethod, String datasource, LocalDateTime preProccessDateTime,
+			String userName, String preProccessStatus, String target) {
 		super();
 		this.uuid = uuid;
 		this.preProccessMethod = preProccessMethod;
 		this.datasource = datasource;
 		this.preProccessDateTime = preProccessDateTime;
 		this.userName = userName;
-		this.preProccessStatus = status;
+		this.preProccessStatus = preProccessStatus;
+		this.target = target;
 	}
 
 	public String getUuid() {
 		return uuid;
 	}
+
 
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
@@ -103,5 +89,11 @@ public class PreProcessRecord {
 		this.preProccessStatus = preProccessStatus;
 	}
 
-	
+	public String getTarget() {
+		return target;
+	}
+
+	public void setTarget(String target) {
+		this.target = target;
+	}
 }

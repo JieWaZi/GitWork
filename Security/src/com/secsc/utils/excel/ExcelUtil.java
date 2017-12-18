@@ -110,6 +110,8 @@ public class ExcelUtil {
 				} else if (cell.getCellStyle().getDataFormat() == HSSFDataFormat
 						.getBuiltinFormat("yyyy/MM/dd")) {
 					obj[j] = cell.getDateCellValue();
+				} else if (cell.getCellType()== 5) {
+					obj[j]="";
 				}
 			}
 			data.add(obj);

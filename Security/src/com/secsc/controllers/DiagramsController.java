@@ -4,30 +4,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.annotation.Resource;
 
-import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.abel533.echarts.Option;
-import com.github.abel533.echarts.Title;
 import com.secsc.beans.charts.Chart;
 import com.secsc.beans.charts.ClusterChart;
-import com.secsc.beans.charts.RosePieChart;
 import com.secsc.beans.charts.StackBarChart;
-import com.secsc.beans.charts.StackEntity;
-import com.secsc.beans.charts.StackLineChart;
 import com.secsc.entity.ClusteringResult;
 import com.secsc.entity.Diagram;
+import com.secsc.entity.EnergyConsumptionStructure;
 import com.secsc.mapper.ClusteringResultsMapper;
 import com.secsc.mapper.DiagramsMapper;
-
-import scala.languageFeature.reflectiveCalls;
+import com.secsc.mapper.EnergyConsumptionStructureMapper;
 
 
 @RestController
@@ -39,13 +33,16 @@ public class DiagramsController {
 
 	@Resource
 	private ClusteringResultsMapper clusteringResultsMapper;
+	
+	@Resource
+	private EnergyConsumptionStructureMapper energyConsumptionStructureMapper;
 
+	
+	
 	@RequestMapping(value = "{diagramUUID}/", method = RequestMethod.GET)
 	public Option getDiagram(@PathVariable("diagramUUID") String uuid) {
-
 		Diagram diagram = diagramsMapper.getDiagramById(uuid);
 		Option option = null;
-
 		switch (diagram.getDiagramType()) {
 		case "ClusterScatterChart":
 			option = _getClusterScatterChart(diagram);
@@ -57,7 +54,9 @@ public class DiagramsController {
 		return option;
 	}
 	
-	@RequestMapping(value = "{diagramUUID}/", method = RequestMethod.PUT)
+	
+	//由于使用echart实体类不好显示，所以返回数据而不是option对象
+	@RequestMapping(value = "/cluster/{diagramUUID}/", method = RequestMethod.GET)
 	public Map<String, Object> getClusterData(@PathVariable("diagramUUID") String uuid){
 		Diagram diagram = diagramsMapper.getDiagramById(uuid);
 		Map<String, Object> map=new HashMap<String, Object>();
@@ -65,6 +64,25 @@ public class DiagramsController {
 		List<ClusteringResult> lists = clusteringResultsMapper.getClusteringResultById(diagram.getDatasourceUuid());
 		map.put("data", lists);
 		return map;
+	}
+	
+	
+	//总览图表
+	@RequestMapping(value = "/overview/{i}/", method = RequestMethod.GET)
+	public Option getOverView(@PathVariable("i") String i){
+		Diagram diagram = diagramsMapper.getDiagramById(i);
+		Option option = null;
+		switch (diagram.getDiagramType()) {
+		case "ClusterScatterChart":
+			option = _getClusterScatterChart(diagram);
+			break;
+		case "BarChart":
+			option = _getStackBarEntity(diagram);
+			break;
+		default:
+			break;
+		}
+		return option;
 	}
 
 	private Option _getClusterScatterChart(Diagram diagram) {
@@ -76,6 +94,14 @@ public class DiagramsController {
 		clusterChart.setSeriesWithEntity(entities);
 		return clusterChart.getOption();
 	}
-
+	
+	private Option _getStackBarEntity(Diagram diagram) {
+		List<EnergyConsumptionStructure> list=energyConsumptionStructureMapper.queryEnergyConsumptionStructureResults();
+		Chart<EnergyConsumptionStructure> chart = new StackBarChart();
+		chart.initChart(diagram.getTitle());
+		chart.displayToolBox(true);
+		chart.setSeriesWithEntity(list);
+		return chart.getOption();
+	}
 
 }

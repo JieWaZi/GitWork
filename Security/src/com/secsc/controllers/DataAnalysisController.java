@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.secsc.entity.DataAnalysisRecord;
+import com.secsc.entity.EnergyConsumptionStructure;
 import com.secsc.entity.PreProcessRecord;
 import com.secsc.entity.myUser;
 import com.secsc.mapper.DataAnalysisMapper;
+import com.secsc.mapper.EnergyConsumptionStructureMapper;
 import com.secsc.mapper.PreProccessMapper;
 import com.secsc.security.AuthenticationInfo;
 import com.secsc.spark.SparkCommit;
@@ -33,48 +35,87 @@ public class DataAnalysisController {
 	@Resource
 	private PreProccessMapper preProccessMapper;
 	
+	@Resource
+	private EnergyConsumptionStructureMapper energyConsumptionStructureMapper;
+	
 	@Resource(name="authInfo")
 	private AuthenticationInfo authenticationInfo;
 
 
-	/**
-	 * 
-	 * web 前后端进行通信并开始数据分析业务的REST接口
-	 */
-	@RequestMapping(value = "/newJob/Submit", method = RequestMethod.POST)
-	public Map<String, String> startDataAnalysisJob(String datasource,int year,String method,String arithmetic,
+
+
+	//聚类业务处理
+	@RequestMapping(value = "/newJob/Submit/clustering", method = RequestMethod.POST)
+	public Map<String, String> startClusterDataAnalysisJob(String datasource,String datamethod,int year,String method,String arithmetic,
 			String param,HttpSession session) {
 		Map<String, String> webInfo = new HashMap<String, String>();
 		String datasourceuuid="";
 		String jarpath=session.getServletContext().getRealPath("/")+"/WEB-INF/lib/";
-		if(datasource.equals("通过均值法处理的数据")){
-			List<PreProcessRecord> list=preProccessMapper.queryRecordsByMethod("averageDataPreProccess");
+		PreProcessRecord record=new PreProcessRecord();
+		record.setTarget(datasource);
+		if(datamethod.equals("通过均值法处理的数据")){
+			record.setPreProccessMethod("averageDataPreProccess");
+			List<PreProcessRecord> list=preProccessMapper.queryRecordsByMethod(record);
 			datasourceuuid=list.get(0).getUuid();
 		}
-		if (method.equals("聚类")) {
-			String uuid=UUID.randomUUID().toString().replaceAll("\\-", "");
-			String username=authenticationInfo.getUserDetails().getUsername();
-			dataAnalysisMapper.insertDataAnalysisRecord(new DataAnalysisRecord(uuid,  LocalDateTime.now(), method,arithmetic, datasourceuuid, "电力、热力生产和供应业",username));
+		String uuid=UUID.randomUUID().toString().replaceAll("\\-", "");
+		String username=authenticationInfo.getUserDetails().getUsername();
+		dataAnalysisMapper.insertDataAnalysisRecord(new DataAnalysisRecord(uuid,  LocalDateTime.now(), method,arithmetic, datasourceuuid, "电力、热力生产和供应业",username));
+		try {
 			try {
-				try {
-					SparkCommit.clusteringOperation(jarpath,datasourceuuid, uuid, year, arithmetic, param);
-				} catch (Exception e) {
-					webInfo.put("status", "1");// code 0 for OK, 1 for coding error, others
-					webInfo.put("info", "Error");// Info key for information
-				}
-				webInfo.put("status", "0");// code 0 for OK, 1 for coding error, others
-				webInfo.put("info", "Finished");// Info key for information
+				SparkCommit.clusteringOperation(jarpath,datasourceuuid, uuid, year, arithmetic, param);
 			} catch (Exception e) {
-				// TODO: handle exception
-				webInfo.put("status", "1");// code 0 for OK, 1 for coding error, others
-											// for customized code according to actual
-											// business
-				webInfo.put("info", "Error");// Info key for information
+				webInfo.put("status", "1");
+				webInfo.put("info", "Error");
 			}
+			webInfo.put("status", "0");
+			webInfo.put("info", "Finished");
+		} catch (Exception e) {
+			// TODO: handle exception
+			webInfo.put("status", "1");// code 0 for OK, 1 for coding error, others
+			webInfo.put("info", "Error");// Info key for information
 		}
+
 		return webInfo;
 	}
+	
+	
+	//能源消费结构统计业务处理
+	@RequestMapping(value = "/newJob/Submit/statistics", method = RequestMethod.POST)
+	public Map<String, String> startStatisticsDataAnalysisJob(String datasource,String datamethod,int year,String method,String arithmetic,
+			HttpSession session) {
+		Map<String, String> webInfo = new HashMap<String, String>();
+		String datasourceuuid="";
+		PreProcessRecord record=new PreProcessRecord();
+		record.setTarget(datasource);
+		record.setPreProccessMethod("zeroDataPreProccess");
+		List<PreProcessRecord> list=preProccessMapper.queryRecordsByMethod(record);
+		datasourceuuid=list.get(0).getUuid();
+		String uuid=UUID.randomUUID().toString().replaceAll("\\-", "");
+		String username=authenticationInfo.getUserDetails().getUsername();
+		dataAnalysisMapper.insertDataAnalysisRecord(new DataAnalysisRecord(uuid,  LocalDateTime.now(), "能源消费结构统计",arithmetic, datasourceuuid, "总览",username));
+		try {
+			EnergyConsumptionStructure ecs=energyConsumptionStructureMapper.selectByYear(year);
+			ecs.setYears(year);
+			energyConsumptionStructureMapper.insertEnergyConsumptionStructureResult(ecs);
+			webInfo.put("status", "0");
+			webInfo.put("info", "Finished");
+		} catch (Exception e) {
+			
+			System.out.println(e.getMessage());
+			
+			// TODO: handle exception
+			webInfo.put("status", "1");
+			webInfo.put("info", "Error");
+		}
 
+
+
+
+		return webInfo;
+	}
+	
+	
 
 	@RequestMapping(value = "/records", method = RequestMethod.GET)
 	public List<DataAnalysisRecord> queryAnalysisRecords() {

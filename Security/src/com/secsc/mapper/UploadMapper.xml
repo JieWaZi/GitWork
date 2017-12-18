@@ -15,14 +15,17 @@
 
 <select id="getUploadRecords" parameterType="UploadRecord" resultType="UploadRecord">
 	
-	select * from upload_records where username=#{upload.username} 
-	and uploadTarget=#{upload.uploadTarget} order by uploadDateTime DESC limit 0,5
+	select * from upload_records where username=#{upload.username}
+	<if test="upload.uploadTarget!=null">
+	and uploadTarget=#{upload.uploadTarget}
+	</if> 
+	order by uploadDateTime DESC limit 0,5
 	
 </select>
 
-<select id="getRecordByID" parameterType="String" resultType="UploadRecord">
+<select id="getRecordByID" parameterType="UploadRecord" resultType="UploadRecord">
 	
-	select * from upload_records where uuid=#{uuid}
+	select * from upload_records where uuid=#{upload.uuid} and username=#{upload.username}
 	
 </select>
 

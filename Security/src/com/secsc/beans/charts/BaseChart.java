@@ -22,17 +22,8 @@ public abstract class BaseChart<T> implements Chart<T> {
 			"pink", "orange", "mediumaquamarine", "firebrick" };
 
 	
-	//绘图网格
-	private Option setGrid() {
-		Grid grid = new Grid();
-		grid.left(3);  //组件离容器左侧的距离
-		grid.right(4);
-		grid.bottom(12);
-		grid.containLabel(true);    //grid 区域是否包含坐标轴的刻度标签
-		option.grid(grid);
-		return option;
-	}
 
+	
 	@Override
 	public Option displayToolBox(boolean diaplay) {
 		if (diaplay) {
@@ -101,12 +92,17 @@ public abstract class BaseChart<T> implements Chart<T> {
 	}
 
 	protected Option getTempOption() {
+		Grid grid = new Grid();
+		grid.left(3);  //组件离容器左侧的距离
+		grid.right(4);
+		grid.bottom(12);
+		grid.containLabel(true);    //grid 区域是否包含坐标轴的刻度标签
+		option.setGrid(grid);
 		return option;
 	}
 
 	@Override
 	public Option getOption() {
-		setGrid();
 		option.backgroundColor("transparent");
 		return option;
 	}

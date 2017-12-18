@@ -275,16 +275,15 @@ function ajaxContents() {
 						$.each(reports, function(i, report) {
 							var diagramThumbnailUUID = report.diagramUuid;
 							if(href == '#outline') {
-								$(href+"Content").append("<div class='col-sm-12 col-md-6' id='" + diagramThumbnailUUID + "' style='height:400px;'></div>");
+								$(href+"Content").append("<div class='col-sm-12 col-md-6' id='" + diagramThumbnailUUID + "' style='height:300px;'></div>");
 								var diagramEle = $("#" + diagramThumbnailUUID);
-								ajaxRequestOption(diagramThumbnailUUID, function(option) {
+								ajaxRequestOfOutline(i, function(option) {
 									var axisLine = {
 										lineStyle: {
 											color: 'lightgray',
 											width: 2, //这里是为了突出显示加上的
 										}
 									};
-									console.log(option);
 									// 使用if确保option中具有完整的相关对象
 									if(option.xAxis != null) {
 										option.xAxis[0]['axisLine'] = axisLine;
@@ -297,11 +296,13 @@ function ajaxContents() {
 											'color': 'white'
 										};
 									}
-									if(option.legend != null) {
-										option.legend['textStyle'] = {
-											'color': 'white'
-										};
+									if(i==0){
+										option.grid['top']='24%'
+										option.legend['textStyle']={
+												color: '#FFFFFF'
+										}
 									}
+									console.log(option);
 									addDiagram(diagramEle, false, option);
 								});
 							} else {
@@ -354,6 +355,7 @@ function ajaxContents() {
 	regModalEvents();
 	$('[data-toggle="popover"]').popover();
 }
+
 
 
 function fillContentPanelTemplet(report, style) {
@@ -453,9 +455,26 @@ function getPanelTemplet(report) {
 /*************************************************************/
 ///////////////////////////////////////////////////////////////
 
+function ajaxRequestOfOutline(i, recallFunc) {
+	$.ajax({
+		url:'diagrams/overview/'+ i + '/',
+		type: 'GET',
+		async: true,
+		dataType: 'json',
+		data: {},
+		success: function(returnOption) {
+			recallFunc(returnOption);
+		},
+		error: function(returndata) {
+			console.log(returndata.status);
+			
+		}
+	});
+}
+
 function ajaxRequestOption(diagram_uuid, recallFunc) {
 	$.ajax({
-		url:'diagrams/' + diagram_uuid + '/',
+		url:'diagrams/'+ diagram_uuid + '/',
 		type: 'GET',
 		async: true,
 		dataType: 'json',
@@ -472,8 +491,8 @@ function ajaxRequestOption(diagram_uuid, recallFunc) {
 
 function ajaxRequestOptionData(diagram_uuid, recallFunc) {
 	$.ajax({
-		url:'diagrams/' + diagram_uuid + '/',
-		type: 'put',
+		url:'diagrams/cluster/' + diagram_uuid + '/',
+		type: 'GET',
 		async: true,
 		dataType: 'json',
 		data: {},

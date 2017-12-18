@@ -16,7 +16,7 @@
 	
 	<insert id="insertDiagram" parameterType="Diagram">
 	
-	    insert into diagrams values(#{diagram.uuid},#{diagram.title},#{diagram.type},#{diagram.datasourceUuid})
+	    insert into diagrams values(#{diagram.uuid},#{diagram.title},#{diagram.diagramType},#{diagram.datasourceUuid})
 	
 	</insert>
 

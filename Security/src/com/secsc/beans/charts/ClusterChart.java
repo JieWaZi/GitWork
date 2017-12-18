@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.abel533.echarts.AxisPointer;
+import com.github.abel533.echarts.Grid;
 import com.github.abel533.echarts.Option;
 import com.github.abel533.echarts.Tooltip;
 import com.github.abel533.echarts.axis.SplitLine;
@@ -107,4 +108,12 @@ public class ClusterChart extends BaseChart<ClusteringResult> {
 		return option;
 	}
 
+	
+	public Option setGrid(Grid grid) {
+		// TODO Auto-generated method stub
+		
+		Option option=getTempOption();
+		option.setGrid(grid);
+		return option;
+	}
 }

@@ -3,6 +3,7 @@ package com.secsc.beans.charts;
 
 import java.util.List;
 
+import com.github.abel533.echarts.Grid;
 import com.github.abel533.echarts.Option;
 
 
@@ -26,6 +27,8 @@ public interface Chart<T> {
 	//设置图例组件
 	public Option setLegend(List<String> data);
 	public Option setLegend(String data);
+	
+	public Option setGrid(Grid grid);
 
 
 

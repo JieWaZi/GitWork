@@ -26,7 +26,7 @@ $(function(){
 	
 	//模态框消失进行刷新数据
 	$("#modalDiaglog").on('hide.bs.modal', function () {
-		ajaxQueryUploadRecord("annualReport2017", function(data) {
+		ajaxQueryUploadRecord(function(data) {
 			displayUploadRecords(data, $("#uploadHistory"));
 		});
 		
@@ -57,7 +57,7 @@ $(function(){
 	
 	
 	//查询历史信息
-	ajaxQueryUploadRecord("annualReport2017", function(data) {
+	ajaxQueryUploadRecord(function(data) {
 		uploaddata=data
 		displayUploadRecords(data, $("#uploadHistory"));
 	});
@@ -70,6 +70,7 @@ $(function(){
 		var footer = modal.find('.modal-footer');
 		title.text("新建上传任务");
 		body.children().remove()
+		footer.children().remove()
 		body.append(getUploadAnualReportTemplet());
 		
 		//注册a标签监听，在选中后更改相关信息
@@ -137,11 +138,11 @@ $(function(){
 			'							选择上传目的<span class="caret"></span>' +
 			'						</button>' +
 			'						<ul class="dropdown-menu">' +
-			'							<li><a href="javascript:void(0)" role="listBtn1">annualReport2017</a></li>' +
-			'							<li><a href="javascript:void(0)" role="listBtn2">annualReport2018</a></li>' +
+			'							<li><a href="javascript:void(0)" role="listBtn1">企业基本信息</a></li>' +
+			'							<li><a href="javascript:void(0)" role="listBtn2">企业能源消费结构</a></li>' +
 			'						</ul>' + 
 			'					</div>' +
-			'					<input type="text" role="listBtnDisplay" value="annualReport2017" name="uploadTarget" class="form-control" value="未选择" readonly="readonly"/>' +
+			'					<input type="text" role="listBtnDisplay" value="企业基本信息" name="uploadTarget" class="form-control" value="未选择" readonly="readonly"/>' +
 			'				</div>' +
 			'			</div>' +
 			'			<div class="col-lg-6 col-sm-12">' +
@@ -195,15 +196,28 @@ $(function(){
 	}
 	
 	
-	function ajaxQueryUploadRecord(target, recallFunc) {
+	function ajaxQueryUploadRecord(recallFunc) {
 		$.ajax({
 			url: 'upload/record/',
 			type: 'GET',
 			async: true,
 			dataType: 'json',
-			data: {
-				"uploadTarget": target,
+			success: function(returndata) {
+				recallFunc(returndata);
 			},
+			error: function(returndata) {
+				ajaxError(returndata);
+			}
+		});
+	}
+	
+	function ajaxQueryUploadRecords(uploadTarget,recallFunc) {
+		$.ajax({
+			url: 'upload/record/',
+			type: 'GET',
+			async: true,
+			dataType: 'json',
+			data:'uploadTarget='+uploadTarget,
 			success: function(returndata) {
 				recallFunc(returndata);
 			},
@@ -270,14 +284,19 @@ $(function(){
 		var footer = modal.find('.modal-footer');
 		title.text("新建预处理任务");
 		body.children().remove()
+		footer.children().remove()
 		body.append(getPreproccessTemplet());
 		regListBtn(body.find("[role='listBtn1']").parents(".input-group"),1, function(target) {
+			updateDatasourceList(body, target);
+		});
+		regListBtn(body.find("[role='listBtn2']").parents(".input-group"),2, function(target) {
 			updateDatasourceList(body, target);
 		});
 
 		body.find("div[stepRole='2']").children('div')
 			.append(getRadioInfoBtnTemplet("averageDataPreProccess", "DataPreProccessMethods", "均值法"));
-		
+		body.find("div[stepRole='2']").children('div')
+		.append(getRadioInfoBtnTemplet("zeroDataPreProccess", "DataPreProccessMethods", "置零法"));
 		regInfoBtnGroup(body, function() {
 			updatePreProccessPara(body);
 		});
@@ -299,7 +318,8 @@ $(function(){
 			'			<div class="input-group-btn">' +
 			'				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">选择数据源类别  <span class="caret"></span></button>' +
 			'				<ul class="dropdown-menu">' +
-			'					<li><a href="#" role="listBtn1" list-value="annualReport2017">annualReport2017</a></li>' +
+			'					<li><a href="#" role="listBtn1" list-value="企业基本信息">企业基本信息</a></li>' +
+			'					<li><a href="#" role="listBtn2" list-value="企业能源消费结构">企业能源消费结构</a></li>' +
 			'				</ul>' +
 			'			</div>' +
 			'			<input type="text" class="form-control" role="listBtnDisplay" value="未选择" readonly="readonly"/>' +
@@ -323,7 +343,7 @@ $(function(){
 	function updateDatasourceList(contentEle, target) {
 		
 		//重写查询上传记录方法
-		ajaxQueryUploadRecord(target, function(data) {
+		ajaxQueryUploadRecords(target,function(data) {
 			var targetDiv = contentEle.find("div[stepRole='1']").children("div:last");
 			targetDiv.empty();
 			$.each(data, function(i, item) {
@@ -332,13 +352,14 @@ $(function(){
 				targetDiv.append(getRadioInfoBtnTemplet(item.uuid, "datasourceList", item.originalName + "/" + formatDatetimeOfJsonObject(uploadDate)));
 			});
 			regInfoBtnGroup(contentEle, function() {
-				updatePreProccessPara(contentEle);
+				var uploadTarget=$("input[role='listBtnDisplay']").val()
+				updatePreProccessPara(contentEle,uploadTarget);
 			});
 	
 		});
 	}
 	
-	function updatePreProccessPara(contentEle) {
+	function updatePreProccessPara(contentEle,uploadTarget) {
 		var datasource = {};
 		var method = {};
 		method['name'] = $(contentEle).find("input[name='DataPreProccessMethods']:checked").val() || null;
@@ -362,14 +383,14 @@ $(function(){
 					.html(getLoadingAnimation("50px", "50px", "处理中..."));
 				$(this).attr("disabled", "disabled");
 				$(this).val("执行中...");
-				ajaxSubmitPreProccessJob(contentEle, datasource, method);
+				ajaxSubmitPreProccessJob(uploadTarget,contentEle, datasource, method);
 			} else {
 				contentEle.children("div:last").children("div").find("div[role='PreproccessTip']").text("数据源或方法未选择！");
 			}
 		});
 	}
 	
-	function ajaxSubmitPreProccessJob(contentEle, datasource, method) {
+	function ajaxSubmitPreProccessJob(uploadTarget,contentEle, datasource, method) {
 		$.ajax({
 			url: 'preprocess/newJob/',
 			type: 'POST',
@@ -377,7 +398,8 @@ $(function(){
 			dataType: 'json',
 			data: {
 				"datasource": datasource.uuid,
-				"method": method.name
+				"method": method.name,
+				"uploadTarget":uploadTarget
 			},
 			success: function(returndata) {
 				if(returndata.status == 0) {
@@ -458,7 +480,7 @@ $(function(){
 					break;
 				default:
 					rowClass = "danger";
-					statusTranslation = item.status;
+					statusTranslation = item.preProccessStatus;
 					break;
 			}
 			var dataTemplet =
@@ -480,6 +502,9 @@ $(function(){
 		switch(method) {
 			case "averageDataPreProccess":
 				method = "均值法";
+				break;
+			case "zeroDataPreProccess":
+				method = "置零法";
 				break;
 			default:
 				method = "未注册的方法";
@@ -541,6 +566,7 @@ $(function(){
 			var footer = modal.find('.modal-footer');
 			title.text("新建数据分析任务");
 			body.children().remove()
+			footer.children().remove()
 			body.append(getNewDataAnalysisTemplet());
 			updateDataAnalysis(body);
 			regListBtn(modal.find("a[role='listBtn1']").parents(".input-group"),1, function(target) {
@@ -577,6 +603,22 @@ $(function(){
 				updateDataAnalysis(body)
 				$(".input-grouptem").remove()
 			});
+			regListBtn(modal.find("a[role='listBtn8']").parents(".input-group"),8,function() {
+				updateDataAnalysis(body)
+			});
+			regListBtn(modal.find("a[role='listBtn9']").parents(".input-group"),9,function() {
+				updateDataAnalysis(body)
+			});
+			regListBtn(modal.find("a[role='listBtn10']").parents(".input-group"),10,function() {
+				updateDataAnalysis(body)
+			});
+			regListBtn(modal.find("a[role='listBtn11']").parents(".input-group"),11,function() {
+				updateDataAnalysis(body)
+			});
+			regListBtn(modal.find("a[role='listBtn12']").parents(".input-group"),12,function() {
+				updateDataAnalysis(body)
+			});
+
 
 			$("input[name='year']").blur(function(){
 				updateDataAnalysis(body)
@@ -590,15 +632,27 @@ $(function(){
 			'<div class="row">' +
 			'<div stepRole="1" class="col-sm-12">' +
 			'	<h3>选择数据源及年份</h3>' +
-			'	<div class="col-sm-10 col-md-8 col-lg-6">' + 
+			'	<div class="col-sm-6 col-md-12 col-lg-6">' + 
 			'		<div class="input-group">' +
 			'			<div class="input-group-btn">' +
 			'				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">选择数据源  <span class="caret"></span></button>' +
 			'				<ul class="dropdown-menu">' +
-			'					<li><a href="#" role="listBtn1" list-value="averageDataPreProccess">通过均值法处理的数据</a></li>' +
+			'					<li><a href="#" role="listBtn1" list-value="企业基本信息">企业基本信息</a></li>' +
+			'					<li><a href="#" role="listBtn8" list-value="企业能源消费结构">企业能源消费结构</a></li>' +
 			'				</ul>' +
 			'			</div>' +
 			'			<input type="text" name="datasource" class="form-control" role="listBtnDisplay"   value="未选择" readonly="readonly"/>' +
+			'		</div>' +
+			'	    <div class="col-sm-12" style="margin-top:1.3em;"></div>' +
+			'		<div class="input-group">' +
+			'			<div class="input-group-btn">' +
+			'				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">选择数据处理类型  <span class="caret"></span></button>' +
+			'				<ul class="dropdown-menu">' +
+			'					<li><a href="#" role="listBtn9" list-value="averageDataPreProccess">通过均值法处理的数据</a></li>' +
+			'					<li><a href="#" role="listBtn10" list-value="zeroDataPreProccess">通过置零法处理的数据</a></li>' +
+			'				</ul>' +
+			'			</div>' +
+			'			<input type="text" name="method" class="form-control" role="listBtnDisplay"   value="未选择" readonly="readonly"/>' +
 			'		</div>' +
 			'	    <div class="col-sm-12" style="margin-top:1.3em;"></div>' +
 			'		<div class="input-group">' +
@@ -619,6 +673,7 @@ $(function(){
 			'					<li><a href="#" role="listBtn2" list-value="聚类">聚类</a></li>' +
 			'					<li><a href="#" role="listBtn3" list-value="关联规则">关联规则</a></li>' +
 			'					<li><a href="#" role="listBtn4" list-value="预测分析">预测分析</a></li>' +
+			'					<li><a href="#" role="listBtn11" list-value="统计">统计</a></li>' +
 			'				</ul>' +
 			'			</div>' +
 			'			<input type="text" name="analysistype" class="form-control"  role="listBtnDisplay" value="未选择" readonly="readonly"/>' +
@@ -635,6 +690,7 @@ $(function(){
 			'					<li><a href="#" role="listBtn5">DBSCAN</a></li>' +
 			'					<li><a href="#" role="listBtn6">FPGrowth</a></li>' +
 			'					<li><a href="#" role="listBtn7">预测</a></li>' +
+			'					<li><a href="#" role="listBtn12">其他</a></li>' +
 			'				</ul>' +
 			'			</div>' +
 			'			<input type="text" name="arithmetic" class="form-control" role="listBtnDisplay3" value="未选择" readonly="readonly"/>' +
@@ -661,6 +717,7 @@ $(function(){
 		var datasource = {};
 		var method = {};
 		datasource['name'] = $(contentEle).find("input[name='datasource']").val() ||"未选择";
+		datasource['method'] = $(contentEle).find("input[name='method']").val() ||"未选择";
 		datasource['year'] = $(contentEle).find("input[name='year']").val() || "未选择";
 		method["analysistype"] = $(contentEle).find("input[name='analysistype']").val() || "未选择";
 		method["arithmetic"] = $(contentEle).find("input[name='arithmetic']").val() || "未选择";
@@ -668,6 +725,7 @@ $(function(){
 		var templet =
 			'<div class="col-sm-12">' +
 			'<p>已选择的数据源：' + datasource.name + '</p>' +
+			'<p>已选择的数据处理方法：' + datasource.method + '</p>' +
 			'<p>已输入的年份：' + datasource.year + '</p>' +
 			'<p>已选择的分析类型：' + method.analysistype + '</p>' +
 			'<p>已选择的方法：' + method.arithmetic + '</p>' +
@@ -678,6 +736,7 @@ $(function(){
 		$("#submitDataAnalysis").click(function() {
 			var params=$(contentEle).find("input[name='param1']").val()+","+$(contentEle).find("input[name='param2']").val();
 			if(datasource.name != "未选择" &&
+					datasource.method != "未选择" &&
 					datasource.year != "未选择" &&
 					method.analysistype != "未选择" &&
 					method.arithmetic != "未选择") {
@@ -685,7 +744,7 @@ $(function(){
 				.html(getLoadingAnimation("50px", "50px", "处理中..."));
 				$(this).attr("disabled", "disabled");
 				$(this).val("执行中...");
-				ajaxSubmitDataAnalysisJob(contentEle, datasource.name, datasource.year, method.analysistype,method.arithmetic,params);
+				ajaxSubmitDataAnalysisJob(contentEle, datasource.name,datasource.method, datasource.year, method.analysistype,method.arithmetic,params);
 			} else {
 				contentEle.children("div:last").children("div").find("div[role='PreproccessTip']").text("数据源或方法未选择！");
 			}
@@ -694,14 +753,16 @@ $(function(){
 
 
 //	ajax进行数据分析  运行spark
-	function ajaxSubmitDataAnalysisJob(contentEle, datasource, year,method,arithmetic,param) {
+	function ajaxSubmitDataAnalysisJob(contentEle, datasource,datamethod, year,method,arithmetic,param) {
+		
 		$.ajax({
-			url: 'dataAnlysisSys/newJob/Submit',
+			url: 'dataAnlysisSys/newJob/Submit/'+methodToUrl(method),
 			type: 'POST',
 			async: true,
 			dataType: 'json',
 			data: {
 				"datasource": datasource,
+				"datamethod": datamethod,
 				"year":year,
 				"method": method,
 				"arithmetic":arithmetic,
@@ -732,7 +793,18 @@ $(function(){
 		});
 	}
 
-
+   function methodToUrl(method){
+	   switch(method){
+	   case "聚类": 
+		   return "clustering";
+	   	   break;
+	   case "统计":
+		   return "statistics";
+	   	   break;
+	   
+	   }
+	   
+   }
 
 
 	function ajaxRequestDataAnalysisHistory(recallFunc) {
@@ -795,8 +867,10 @@ $(function(){
 			var footer = modal.find('.modal-footer');
 			title.text("新建分析报告");
 			body.children().remove()
+			footer.children().remove()
 			body.append(getNewReportTemplet());
 			$("#newReportMenu").append(getRadioInfoBtnTemplet("elec-heat", "menuItems", "电力、热力生产和供应业"))
+			$("#newReportMenu").append(getRadioInfoBtnTemplet("pandect", "menuItems", "总览"))
 			$("#newReportMenu").append(getRadioInfoBtnTemplet("other", "menuItems", "其他"))
 			regInfoBtnGroup(body, function() {});
 			$("#newReportDataSource").append(getListBtnTemplet());
@@ -804,6 +878,9 @@ $(function(){
 			var data = [{
 				"name": "聚类",
 				"value": "clustering_results"
+			},{
+				"name": "能源消费结构统计",
+				"value": "energy_consumption_results"
 			},{
 				"name": "其他",
 				"value": "other"
@@ -824,6 +901,20 @@ $(function(){
 				});
 			});
 			regListBtn($("#newReportDataSource").children(".input-group"),2, function(target) {
+				ajaxRequestDataSource("能源消费结构统计", function(ds) {
+					var container = $("#newReportDataSource").children("div:last");
+					container.empty();
+					$.each(ds, function(i, item) {
+						container.append(getRadioInfoBtnTemplet(item.uuid, "reportDS",formatDatetimeOfJsonObject(item.jobDateTime)))
+						if(i == 0) {
+							container.find("input[type='radio']").attr("checked", "checked");
+						}
+					});
+					regInfoBtnGroup($("#newReportDataSource"), function() {});
+				});
+			});
+			
+			regListBtn($("#newReportDataSource").children(".input-group"),3, function(target) {
 				ajaxRequestDataSource("other", function(ds) {
 					var container = $("#newReportDataSource").children("div:last");
 					container.empty();

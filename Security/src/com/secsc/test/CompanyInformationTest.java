@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
@@ -16,7 +17,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.secsc.entity.CompanyInformation;
+import com.secsc.entity.EnergyConsumptionStructure;
 import com.secsc.mapper.CompanyInformationMapper;
+import com.secsc.mapper.EnergyConsumptionStructureMapper;
 import com.secsc.utils.excel.DataTable;
 import com.secsc.utils.excel.ExcelUtil;
 
@@ -69,4 +72,6 @@ public class CompanyInformationTest {
         //关闭session  
         session.close();
 	}
+	
+	
 }

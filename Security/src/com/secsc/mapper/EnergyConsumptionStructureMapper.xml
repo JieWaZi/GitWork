@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC   
+	    "-//mybatis.org//DTD Mapper 3.0//EN"  
+	    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	    
+<mapper namespace="com.secsc.mapper.EnergyConsumptionStructureMapper">
+
+	<insert id="insertEnergyConsumptionStructure" parameterType="java.util.List">
+	
+	insert into energy_consumption_structure values
+	  <foreach collection="list" item="item" index="index" separator="," >  
+        (#{item.legalPersonCode},#{item.years},#{item.rowCoal},#{item.anthracite},
+        #{item.buerlyte},#{item.commonCoal},#{item.lignite},#{item.washedCoal},#{item.otherWashingCoal},
+        #{item.coalProducts},#{item.coke},#{item.otherCokingProducts},#{item.cokeOvenGas},
+        #{item.blastFurnaceGas},#{item.converterGas},#{item.producerGas},#{item.naturalGas},
+        #{item.liquifiedNaturalGas},#{item.coalbedGas},#{item.crude},#{item.gasoline},
+        #{item.kerosene},#{item.dieselOil},#{item.fuelOil},#{item.liquefiedPetroleumGas},
+        #{item.refineryGas},#{item.otherPetroleumProducts},#{item.naphtha},#{item.lubricant},
+        #{item.petrolin},#{item.mineralSpirits},#{item.petrolCoke},#{item.petroleumAsphalt},
+        #{item.otherPetrol},#{item.heatingPower},#{item.electricPower},#{item.otherFuels},
+        #{item.gangueFuels},#{item.municipalRefuse},#{item.biomassFuel},#{item.industrialWasteFuel},
+        #{item.otherFuel},#{item.methane},#{item.bagasse},#{item.bark},#{item.cornCob},#{item.firewood},
+        #{item.riceHusk},#{item.sawdustShaving},#{item.residualPressure},#{item.processUuid},#{item.preProcessMethod})  
+    </foreach> 
+	
+	</insert>
+	
+	
+	<select id="selectByYear" parameterType="Integer" resultType="EnergyConsumptionStructure">
+	
+		select sum(RowCoal) as RowCoal,sum(Anthracite) as Anthracite,sum(Buerlyte) as Buerlyte,sum(CommonCoal) as CommonCoal,sum(Lignite) as Lignite,sum(WashedCoal) as WashedCoal
+		,sum(OtherWashingCoal) as OtherWashingCoal,sum(CoalProducts) as CoalProducts,sum(Coke) as Coke,sum(OtherCokingProducts) as OtherCokingProducts,sum(CokeOvenGas) as CokeOvenGas,sum(BlastFurnaceGas) as BlastFurnaceGas
+		,sum(ConverterGas) as ConverterGas,sum(ProducerGas) as ProducerGas,sum(NaturalGas) as NaturalGas,sum(LiquifiedNaturalGas) as LiquifiedNaturalGas,sum(CoalbedGas) as CoalbedGas,sum(Crude) as Crude
+		,sum(Gasoline) as Gasoline,sum(Kerosene) as Kerosene,sum(DieselOil) as DieselOil,sum(FuelOil) as FuelOil,sum(LiquefiedPetroleumGas) as LiquefiedPetroleumGas,sum(RefineryGas) as RefineryGas
+		,sum(OtherPetroleumProducts) as OtherPetroleumProducts,sum(Naphtha) as Naphtha,sum(Lubricant) as Lubricant,sum(Petrolin) as Petrolin,sum(MineralSpirits) as MineralSpirits,sum(PetrolCoke) as PetrolCoke
+		,sum(PetroleumAsphalt) as PetroleumAsphalt,sum(OtherPetrol) as OtherPetrol,sum(HeatingPower) as HeatingPower,sum(ElectricPower) as ElectricPower,sum(OtherFuels) as OtherFuels,sum(GangueFuels) as GangueFuels
+		,sum(MunicipalRefuse) as MunicipalRefuse,sum(BiomassFuel) as BiomassFuel,sum(IndustrialWasteFuel) as IndustrialWasteFuel,sum(OtherFuel) as OtherFuel,sum(Methane) as Methane,sum(Bagasse) as Bagasse
+		,sum(Bark) as Bark,sum(CornCob) as CornCob,sum(Firewood) as Firewood,sum(RiceHusk) as RiceHusk,sum(SawdustShaving) as SawdustShaving,sum(ResidualPressure) as ResidualPressure from energy_consumption_structure
+		where years=#{year};
+	
+	</select>
+
+
+	<insert id="insertEnergyConsumptionStructureResult" parameterType="EnergyConsumptionStructure">
+	
+	insert into energy_consumption_results values  
+        (#{ecs.years},#{ecs.rowCoal},#{ecs.anthracite},
+        #{ecs.buerlyte},#{ecs.commonCoal},#{ecs.lignite},#{ecs.washedCoal},#{ecs.otherWashingCoal},
+        #{ecs.coalProducts},#{ecs.coke},#{ecs.otherCokingProducts},#{ecs.cokeOvenGas},
+        #{ecs.blastFurnaceGas},#{ecs.converterGas},#{ecs.producerGas},#{ecs.naturalGas},
+        #{ecs.liquifiedNaturalGas},#{ecs.coalbedGas},#{ecs.crude},#{ecs.gasoline},
+        #{ecs.kerosene},#{ecs.dieselOil},#{ecs.fuelOil},#{ecs.liquefiedPetroleumGas},
+        #{ecs.refineryGas},#{ecs.otherPetroleumProducts},#{ecs.naphtha},#{ecs.lubricant},
+        #{ecs.petrolin},#{ecs.mineralSpirits},#{ecs.petrolCoke},#{ecs.petroleumAsphalt},
+        #{ecs.otherPetrol},#{ecs.heatingPower},#{ecs.electricPower},#{ecs.otherFuels},
+        #{ecs.gangueFuels},#{ecs.municipalRefuse},#{ecs.biomassFuel},#{ecs.industrialWasteFuel},
+        #{ecs.otherFuel},#{ecs.methane},#{ecs.bagasse},#{ecs.bark},#{ecs.cornCob},#{ecs.firewood},
+        #{ecs.riceHusk},#{ecs.sawdustShaving},#{ecs.residualPressure})
+	</insert>
+	
+	
+	<select id="queryEnergyConsumptionStructureResults" resultType="EnergyConsumptionStructure">
+	
+		select * from energy_consumption_results
+		
+	</select>
+
+</mapper>

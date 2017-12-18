@@ -24,13 +24,18 @@ http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 			<param-value>classpath:SpringMVC-servlet.xml</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
+		<multipart-config>
+			<max-file-size>104857600</max-file-size>
+			<max-request-size>1140850688</max-request-size>
+			<file-size-threshold>104857600</file-size-threshold>
+		</multipart-config>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>spring</servlet-name>
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
 
-	<!-- spring security -->
+	<!-- spring security 过滤器-->
 	<filter>  
         <filter-name>springSecurityFilterChain</filter-name>  
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy  
@@ -41,11 +46,6 @@ http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
         <filter-name>springSecurityFilterChain</filter-name>  
         <url-pattern>/*</url-pattern>  
     </filter-mapping>
-    
-    <context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>classpath:spring-security.xml</param-value>
-	</context-param>
     
 
 	<!-- 编码过滤器，解决中文乱码 -->
@@ -59,6 +59,27 @@ http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 	</filter>
 	<filter-mapping>
 		<filter-name>SpringEncoding</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	
+	<!-- 浏览器不支持put,delete等method,由该filter将/xxx?_method=delete转换为标准的http delete方法 -->
+    <filter>
+        <filter-name>hiddenHttpMethodFilter</filter-name>
+        <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>hiddenHttpMethodFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
+    <!-- put接受参数 -->
+    <filter>
+		<filter-name>httpPutFormcontentFilter</filter-name>
+		<filter-class>org.springframework.web.filter.HttpPutFormContentFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>httpPutFormcontentFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 

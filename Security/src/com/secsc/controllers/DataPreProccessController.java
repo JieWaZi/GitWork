@@ -13,8 +13,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.secsc.datapreprocess.imp.DataPreProcessJob;
+import com.secsc.datapreprocess.imp.DataPreProcessor;
+import com.secsc.datapreprocess.service.BaseDataPreprocessor;
 import com.secsc.datapreprocess.service.CompanyBusinessDetailsDataPreProcess;
+import com.secsc.datapreprocess.service.EnergyConsumptionStructureDataPreProcess;
 import com.secsc.entity.PreProcessRecord;
+import com.secsc.entity.UploadRecord;
 import com.secsc.exception.ContentNOTSatisifiedReqException;
 import com.secsc.exception.EmptyListException;
 import com.secsc.exception.IncomputableException;
@@ -33,7 +38,10 @@ import com.secsc.security.AuthenticationInfo;
 public class DataPreProccessController {
 	
 	@Resource
-	private CompanyBusinessDetailsDataPreProcess procceccor;
+	private CompanyBusinessDetailsDataPreProcess cproccess;
+	
+	@Resource
+	private EnergyConsumptionStructureDataPreProcess eproccess;
 
 	@Resource
 	private PreProccessMapper preProccessMapper;
@@ -47,21 +55,36 @@ public class DataPreProccessController {
 
 
 	@RequestMapping(value = "/newJob/", method = RequestMethod.POST)
-	public Map<String, String> newPreProccessJob(String datasource,
+	public Map<String, String> newPreProccessJob(String uploadTarget,String datasource,
 			String method, HttpServletRequest request) {
 		Map<String, String> webStatus = new TreeMap<String, String>();
+		DataPreProcessJob<String> dataprocess=null;
 		String info = "";
 		String statusCode = "0";// 0 表示 OK
+		switch (uploadTarget) {
+		case "企业基本信息":
+			dataprocess=cproccess;
+			break;
+		case "企业能源消费结构":
+			dataprocess=eproccess;
+			break;
+		default:
+			break;
+		}
 
+		UploadRecord upload=new UploadRecord();
+		upload.setUsername(authenticationInfo.getUserDetails().getUsername());
+		upload.setUuid(datasource);
 		// 获得上传的数据源
-		String filePath = uploadMapper.getRecordByID(datasource)
+		String filePath = uploadMapper.getRecordByID(upload)
 				.getFilePath();
 		String datasourceDescriptor = request.getSession().getServletContext()
 				.getRealPath("") + filePath;
 		String username=authenticationInfo.getUserDetails().getUsername();
-		procceccor.startPreprocessJob(method, username,datasourceDescriptor, datasource);
+		
+		dataprocess.startPreprocessJob(method, username,datasourceDescriptor, datasource,uploadTarget);
 		try {
-			procceccor.doPreprocess(method);
+			dataprocess.doPreprocess(method);
 		} catch (EmptyListException e) {
 			info += "用于匹配的表头未设定：" + e.getMessage();
 			statusCode = "1";// 1 for coding error.
@@ -79,14 +102,13 @@ public class DataPreProccessController {
 			info += "数据源不符合要求：" + e.getMessage();
 			statusCode = "2";// 2 for ds error;
 		}
-
 		if (!"0".equals(statusCode)) {
-			procceccor.stopJob(info);
+			dataprocess.stopJob(info);
 		}
 
 		webStatus.put("status", statusCode);
 		webStatus.put("info", info);
-		webStatus.put("proccessUUID", procceccor.getUuid());
+		webStatus.put("proccessUUID", dataprocess.getUuid());
 		return webStatus;
 	}
 
@@ -94,7 +116,7 @@ public class DataPreProccessController {
 	public Map<String, String> getProccessingStatus(
 			@PathVariable(value = "uuid") String uuid) {
 		Map<String, String> webStatus = new TreeMap<String, String>();
-		if (uuid.equals(procceccor.getUuid())) {
+		if (uuid.equals(cproccess.getUuid())) {
 			webStatus.put("status",
 					preProccessMapper.queryRecordByUUID(uuid).getPreProccessStatus());
 		} else {

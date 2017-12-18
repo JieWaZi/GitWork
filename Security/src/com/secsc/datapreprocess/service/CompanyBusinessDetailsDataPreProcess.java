@@ -18,6 +18,7 @@ import com.secsc.datapreprocess.imp.DataPreProcessor;
 import com.secsc.datapreprocess.imp.DataSourceEntityMapper;
 import com.secsc.entity.CompanyDetail;
 import com.secsc.entity.PreProcessRecord;
+import com.secsc.entity.UploadRecord;
 import com.secsc.exception.ContentNOTSatisifiedReqException;
 import com.secsc.exception.EmptyListException;
 import com.secsc.exception.IncomputableException;
@@ -336,13 +337,17 @@ public class CompanyBusinessDetailsDataPreProcess
 		file = new File(datasourceDescriptor[0]);
 		uuid = UUID.randomUUID().toString().replaceAll("-", "");
 		PreProcessRecord record = new PreProcessRecord();
+		UploadRecord uploadRecord=new UploadRecord();
+		uploadRecord.setUsername(username);
+		uploadRecord.setUuid(datasourceDescriptor[1]);
 		record.setUuid(uuid);
 		record.setDatasource(
-				uploadMapper.getRecordByID(datasourceDescriptor[1]).getUuid());
+				uploadMapper.getRecordByID(uploadRecord).getUuid());
 		record.setPreProccessDateTime(LocalDateTime.now());
 		record.setPreProccessMethod(method);
 		record.setPreProccessStatus("0:inited.");
 		record.setUserName(username);
+		record.setTarget(datasourceDescriptor[2]);
 		preProccessMapper.insertPreProcessRecord(record);
 	}
 
