@@ -4,7 +4,7 @@ import org.apache.spark.deploy.SparkSubmit;
 
 public class SparkCommit {
    
-	public static void clusteringOperation(String jarpath,String datasource,String uuid,int year,String arithmetic,
+	public static void clusteringOperation(String target,String jarpath,String datasource,String uuid,int year,String arithmetic,
 			String param){
 		
 		String params[]=param.split(",");
@@ -20,6 +20,7 @@ public class SparkCommit {
 	                datasource,             //proccess_uuid
 	                uuid,                   //clustering_batch_ID
 	                arithmetic,             //算法
+	                target                  //类别
 	        };  
 	        SparkSubmit.main(arg0);
 	}

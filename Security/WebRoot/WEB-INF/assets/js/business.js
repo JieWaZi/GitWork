@@ -138,8 +138,8 @@ $(function(){
 			'							选择上传目的<span class="caret"></span>' +
 			'						</button>' +
 			'						<ul class="dropdown-menu">' +
-			'							<li><a href="javascript:void(0)" role="listBtn1">企业基本信息</a></li>' +
-			'							<li><a href="javascript:void(0)" role="listBtn2">企业能源消费结构</a></li>' +
+			'							<li><a href="javascript:void(0)" role="listBtn1" list-value="企业基本信息">企业基本信息</a></li>' +
+			'							<li><a href="javascript:void(0)" role="listBtn2" list-value="企业能源消费结构">企业能源消费结构</a></li>' +
 			'						</ul>' + 
 			'					</div>' +
 			'					<input type="text" role="listBtnDisplay" value="企业基本信息" name="uploadTarget" class="form-control" value="未选择" readonly="readonly"/>' +
@@ -520,7 +520,7 @@ $(function(){
 	function regListBtn(listBtnEle, i,recallFunc) {
 		var target = listBtnEle.find("a[ role='listBtn"+i+"']");
 		target.click(function() {
-			listBtnEle.children("input").val(target.text());
+			//listBtnEle.children("input").val(target.text());
 			listBtnEle.children("input").attr("value",target.attr("list-value"));
 			listBtnEle.children("div").removeClass("open");
 			recallFunc(target.attr("list-value")); //do some operation after select a btn
@@ -618,6 +618,9 @@ $(function(){
 			regListBtn(modal.find("a[role='listBtn12']").parents(".input-group"),12,function() {
 				updateDataAnalysis(body)
 			});
+			regListBtn(modal.find("a[role='listBtn13']").parents(".input-group"),13,function() {
+				updateDataAnalysis(body)
+			});
 
 
 			$("input[name='year']").blur(function(){
@@ -637,7 +640,12 @@ $(function(){
 			'			<div class="input-group-btn">' +
 			'				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">选择数据源  <span class="caret"></span></button>' +
 			'				<ul class="dropdown-menu">' +
-			'					<li><a href="#" role="listBtn1" list-value="企业基本信息">企业基本信息</a></li>' +
+			'					<li class="dropdown-submenu"><a href="#" >企业基本信息</a>'+
+			'						<ul class="dropdown-menu">'+
+			'							<li><a href="#" role="listBtn13" list-value="企业基本信息/所有类别">所有类别</a></li>'+
+			'							<li><a href="#" role="listBtn1" list-value="企业基本信息/电力、热力生产和供应业">电力、热力生产和供应业</a></li>'+
+			'						</ul>'+
+			'					</li>' +
 			'					<li><a href="#" role="listBtn8" list-value="企业能源消费结构">企业能源消费结构</a></li>' +
 			'				</ul>' +
 			'			</div>' +
@@ -648,8 +656,8 @@ $(function(){
 			'			<div class="input-group-btn">' +
 			'				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">选择数据处理类型  <span class="caret"></span></button>' +
 			'				<ul class="dropdown-menu">' +
-			'					<li><a href="#" role="listBtn9" list-value="averageDataPreProccess">通过均值法处理的数据</a></li>' +
-			'					<li><a href="#" role="listBtn10" list-value="zeroDataPreProccess">通过置零法处理的数据</a></li>' +
+			'					<li><a href="#" role="listBtn9" list-value="通过均值法处理的数据">通过均值法处理的数据</a></li>' +
+			'					<li><a href="#" role="listBtn10" list-value="通过置零法处理的数据">通过置零法处理的数据</a></li>' +
 			'				</ul>' +
 			'			</div>' +
 			'			<input type="text" name="method" class="form-control" role="listBtnDisplay"   value="未选择" readonly="readonly"/>' +
@@ -687,10 +695,10 @@ $(function(){
 			'			<div class="input-group-btn">' +
 			'				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">选择数据分析算法<span class="caret"></span></button>' +
 			'				<ul class="dropdown-menu">' +
-			'					<li><a href="#" role="listBtn5">DBSCAN</a></li>' +
-			'					<li><a href="#" role="listBtn6">FPGrowth</a></li>' +
-			'					<li><a href="#" role="listBtn7">预测</a></li>' +
-			'					<li><a href="#" role="listBtn12">其他</a></li>' +
+			'					<li><a href="#" role="listBtn5" list-value="DBSCAN">DBSCAN</a></li>' +
+			'					<li><a href="#" role="listBtn6" list-value="FPGrowth">FPGrowth</a></li>' +
+			'					<li><a href="#" role="listBtn7" list-value="预测">预测</a></li>' +
+			'					<li><a href="#" role="listBtn12" list-value="其他">其他</a></li>' +
 			'				</ul>' +
 			'			</div>' +
 			'			<input type="text" name="arithmetic" class="form-control" role="listBtnDisplay3" value="未选择" readonly="readonly"/>' +

@@ -52,7 +52,10 @@ public class DataAnalysisController {
 		String datasourceuuid="";
 		String jarpath=session.getServletContext().getRealPath("/")+"/WEB-INF/lib/";
 		PreProcessRecord record=new PreProcessRecord();
-		record.setTarget(datasource);
+		int index=datasource.indexOf("/");
+		record.setTarget(datasource.substring(0, index));
+		System.out.println(datasource.substring(0, index));
+		System.out.println(datasource.substring(index+1));
 		if(datamethod.equals("通过均值法处理的数据")){
 			record.setPreProccessMethod("averageDataPreProccess");
 			List<PreProcessRecord> list=preProccessMapper.queryRecordsByMethod(record);
@@ -60,10 +63,10 @@ public class DataAnalysisController {
 		}
 		String uuid=UUID.randomUUID().toString().replaceAll("\\-", "");
 		String username=authenticationInfo.getUserDetails().getUsername();
-		dataAnalysisMapper.insertDataAnalysisRecord(new DataAnalysisRecord(uuid,  LocalDateTime.now(), method,arithmetic, datasourceuuid, "电力、热力生产和供应业",username));
+		dataAnalysisMapper.insertDataAnalysisRecord(new DataAnalysisRecord(uuid,  LocalDateTime.now(), method,arithmetic, datasourceuuid, datasource.substring(index+1),username));
 		try {
 			try {
-				SparkCommit.clusteringOperation(jarpath,datasourceuuid, uuid, year, arithmetic, param);
+				SparkCommit.clusteringOperation(datasource.substring(index+1),jarpath,datasourceuuid, uuid, year, arithmetic, param);
 			} catch (Exception e) {
 				webInfo.put("status", "1");
 				webInfo.put("info", "Error");
@@ -93,7 +96,7 @@ public class DataAnalysisController {
 		datasourceuuid=list.get(0).getUuid();
 		String uuid=UUID.randomUUID().toString().replaceAll("\\-", "");
 		String username=authenticationInfo.getUserDetails().getUsername();
-		dataAnalysisMapper.insertDataAnalysisRecord(new DataAnalysisRecord(uuid,  LocalDateTime.now(), "能源消费结构统计",arithmetic, datasourceuuid, "总览",username));
+		dataAnalysisMapper.insertDataAnalysisRecord(new DataAnalysisRecord(uuid,  LocalDateTime.now(), "能源消费结构统计",arithmetic, datasourceuuid, "所有类型",username));
 		try {
 			EnergyConsumptionStructure ecs=energyConsumptionStructureMapper.selectByYear(year);
 			ecs.setYears(year);
