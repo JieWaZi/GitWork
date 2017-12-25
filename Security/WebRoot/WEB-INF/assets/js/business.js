@@ -565,6 +565,7 @@ $(function(){
 			var body = modal.find('.modal-body');
 			var footer = modal.find('.modal-footer');
 			title.text("新建数据分析任务");
+			title.append("<input type='hidden' name='Resultuuid'/>")
 			body.children().remove()
 			footer.children().remove()
 			body.append(getNewDataAnalysisTemplet());
@@ -635,7 +636,7 @@ $(function(){
 			'<div class="row">' +
 			'<div stepRole="1" class="col-sm-12">' +
 			'	<h3>选择数据源及年份</h3>' +
-			'	<div class="col-sm-6 col-md-12 col-lg-6">' + 
+			'	<div class="col-sm-6 col-md-6 col-lg-6">' + 
 			'		<div class="input-group">' +
 			'			<div class="input-group-btn">' +
 			'				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">选择数据源  <span class="caret"></span></button>' +
@@ -738,7 +739,9 @@ $(function(){
 			'<p>已选择的分析类型：' + method.analysistype + '</p>' +
 			'<p>已选择的方法：' + method.arithmetic + '</p>' +
 			'<p>当前任务状态：<div role="PreproccessTip">待提交</div></p>' +
-			'<p><input type="button" id="submitDataAnalysis" class="btn btn-primary" value="确定并开始数据分析"></p>' +
+			'<p><input type="button" id="submitDataAnalysis" class="btn btn-primary" value="确定并开始数据分析">'+
+			'<input style="margin-left:30px;display:none" type="button" id="showAnalysisResult" class="btn btn-success" value="显示分析结果">'+
+			'</p>' +
 			'</div>';
 		contentEle.find("div[stepRole='5']").children("div").html(templet);
 		$("#submitDataAnalysis").click(function() {
@@ -756,6 +759,11 @@ $(function(){
 			} else {
 				contentEle.children("div:last").children("div").find("div[role='PreproccessTip']").text("数据源或方法未选择！");
 			}
+		});
+		
+		$("#showAnalysisResult").click(function() {
+			var resultUuid= $("input[name='Resultuuid']").val()
+			loadModal(resultUuid,$('#modalDiaglog'))
 		});
 	}
 
@@ -779,7 +787,8 @@ $(function(){
 			success: function(returndata) {
 				if(returndata.status == 0) {
 					contentEle.children("div:last").children("div").find("div[role='PreproccessTip']").text("任务已完成！");
-					console.log(contentEle);
+					$("#showAnalysisResult").attr("style","margin-left:30px")
+					$("input[name='Resultuuid']").val(returndata.uuid)
 					$("#submitDataAnalysis").removeAttr("disabled");
 					$("#submitDataAnalysis").val("再次执行");
 				} else {
@@ -852,9 +861,229 @@ $(function(){
 		}
 	}
 	
+	//显示分析结果图，方便用户查看和进行数据设置
 	
+	function loadModal(uuid, modal) {
+		var title = modal.find('.modal-header');
+		var body = modal.find('.modal-body');
+		var footer = modal.find('.modal-footer');
+		var method = $("input[name='analysistype']").val()
+		var uuid = $("input[name='Resultuuid']").val()
+		var inputtemplate = '<div class="input-group" id="crowedgroup">'
+		var num=0
+		switch(method) {
+		case "聚类":
+			title.html("聚类结果")
+			body.html(getReportDetailsTemplet(modal.height(), modal.width()));
+			ajaxClusterResultOptionData1(uuid,function(data) {
+				$.each(data.legend,function(index,value){
+					inputtemplate=inputtemplate+
+					'<span class="input-group-addon">簇组'+value+'</span>'+
+					'<input class="col-md-4 form-control"  type="text" name="crowed'+index+'"/>'
+				})
+				inputtemplate=inputtemplate+'</div><br /><input class="col-md-4 btn btn-primary" type="button" name="crowedsubmit" value="提交" />'
+				var json=clusterOption(data)
+				addDiagram(modal.find("[role='diagramContainer']"), false, json);
+				modal.find("[role='install']").children("h3").html("设置簇别名")
+				modal.find("[role='install']").append(inputtemplate)
+				$("input[name='crowedsubmit']").click(function(){
+					ajaxupdateClusterName(uuid,function(data){
+						body.html(getReportDetailsTemplet(modal.height(), modal.width()));
+						var json=clusterOption(data)
+						addDiagram(modal.find("[role='diagramContainer']"), false, json);
+					})
+				})
+			})
+			break;
+		default:
+			break;
+		}
+
+	}
 	
+	function ajaxupdateClusterName(uuid,recallFunc){
+		var json={}
+		$("#crowedgroup input").each(function(index){
+			var crowed=$(this).prev().text()
+			json[crowed]= $("input[name='crowed"+index+"']").val()
+		})
+
+		$.ajax({
+			url: 'dataAnlysisSys/clustering/modify/'+uuid,
+			type: 'POST',
+			async: true,
+			dataType: 'json',
+			data: {"json":JSON.stringify(json)},
+			success: function(report) {
+				recallFunc(report);
+			},
+			error: function(data) {
+				console.log(data);
+			}
+		})
+	}
 	
+	function ajaxClusterResultOptionData1(uuid,recallFunc){
+		$.ajax({
+			url: 'diagrams/result/cluster/'+ uuid +'/',
+			type: 'GET',
+			async: true,
+			dataType: 'json',
+			data: {},
+			success: function(report) {
+				recallFunc(report);
+			},
+			error: function(data) {
+				console.log(data);
+			}
+		});
+	}
+
+	
+	function addDiagram(ele, showTitle, option) {
+		var domEle = ele[0];
+		var mychart = echarts.init(domEle, 'macarons');
+		mychart.setOption(option);
+		$(window).resize(function() {
+			$(mychart).each(function(index, chart) {
+				chart.resize();
+			});
+		});
+
+	}
+	
+	function getReportDetailsTemplet(width, height) {
+		var width = width;
+		var height = screen.height * 0.4;
+		var templet =
+			'<div class="row">' +
+			'	<div class="col-md-12" role="diagramContainer" style="height:' + height + 'px;width:' + width + 'px;">' +
+			'	</div>' +
+			'	<div class="col-md-12" role="install">' +
+			'		<h3></h3>' +
+			'	</div>' +
+			'</div   >';
+		return templet;
+	}
+	
+	function clusterOption(data){
+		
+	    var title=data.title
+		var list=data.data
+		var serie=[]
+		$.each(list, function(i, item) {
+			var tag=""
+			if(item.clustertagalias!=""){
+				tag=item.clustertagalias
+			}else{
+				tag=item.clustertag
+			}
+			template={
+		        		large: true,
+		        		name: tag,
+		        		type: 'scatter',
+		        		symbolSize: 5,
+		        		data: [[item.x2D,item.y2D,item.clustertag,item.clustertag,item.companyName]]
+		   			},
+		    serie.push(template)
+		})
+
+		var option = {
+		        backgroundColor: 'transparent',
+			    title : {
+			        text: title,
+			    },
+			    grid: {
+			        left: '3%',
+			        right: '7%',
+			        bottom: '3%',
+			        containLabel: true
+			    },
+			    tooltip : {
+			        showDelay : 20,
+			        formatter : function (params) {return '公司名称：'+params.value[3]+'</br>所属类别：'
+			        			+params.value[2]+'</br>单位增加值能耗：'+params.value[0]+'</br>能源消费占总成本比：'
+			        			+params.value[1]+'</br>'},
+			        axisPointer:{
+			            show: false,
+			            type : 'cross',
+			            lineStyle: {
+			                type : 'dashed',
+			                width : 10
+			            }
+			        },
+			        zlevel: 1
+			    },
+			    toolbox: {
+			        feature: {
+			            dataZoom: { 
+			            	show: true,
+			                title: {
+			                    dataZoom: '区域缩放',
+			                    dataZoomReset: '区域缩放后退'
+			                }},
+			            dataView: {
+			                    show: true,
+			                    title: '数据视图',
+			                    readOnly: true,
+			                    lang: [
+			                        '数据视图',
+			                        '关闭',
+			                        '刷新'
+			                    ]
+			                },
+			            restore: {
+			                    show: true,
+			                    title: '还原'
+			                },
+			            saveAsImage: {
+			                    show: true,
+			                    title: '保存为图片',
+			                    type: 'png',
+			                    lang: [
+			                        '点击保存'
+			                    ]
+			                }
+			        },
+		        show: true,
+		        right: 40
+			    },
+			    
+			    legend: {
+			        data: data.legend,
+			        orient: 'vertical',
+			        x: 'right',
+			        y: 60
+			    },
+			    xAxis : [
+			        {
+			            type : 'value',
+			            scale:true,
+			            axisLabel : {
+			                formatter: '{value} '
+			            },
+			            splitLine: {
+			                show: false
+			            }
+			        }
+			    ],
+			    yAxis : [
+			        {
+			            type : 'value',
+			            scale:true,
+			            axisLabel : {
+			                formatter: '{value} '
+			            },
+			            splitLine: {
+			                show: false
+			            }
+			        }
+			    ],
+			    series : serie
+			};
+		
+		return option
+	}	
 ///////////////////////////////////////////////////////////////
 /*************************************************************/
 /*************************************************************/

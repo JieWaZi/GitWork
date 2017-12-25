@@ -2,8 +2,10 @@ package com.secsc.controllers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -63,6 +65,25 @@ public class DiagramsController {
 		map.put("title", diagram.getTitle());
 		List<ClusteringResult> lists = clusteringResultsMapper.getClusteringResultById(diagram.getDatasourceUuid());
 		map.put("data", lists);
+		return map;
+	}
+	
+	@RequestMapping(value = "/result/cluster/{clusterUUID}/", method = RequestMethod.GET)
+	public Map<String, Object> getResultClusterData(@PathVariable("clusterUUID") String uuid){
+		Map<String, Object> map=new HashMap<String, Object>();
+		map.put("title", "聚类结果");
+		List<ClusteringResult> lists = clusteringResultsMapper.getClusteringResultById(uuid);
+		map.put("data", lists);
+		Set<String> tag=new HashSet<String>();
+		for (ClusteringResult cr : lists) {
+			if (cr.getClustertagalias()!=null&&!"".equals(cr.getClustertagalias())) {
+				tag.add(cr.getClustertagalias());
+			}else {
+				tag.add(cr.getClustertag());
+			}
+			
+		}
+		map.put("legend", tag);
 		return map;
 	}
 	

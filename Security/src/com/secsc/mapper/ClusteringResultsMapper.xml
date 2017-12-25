@@ -10,4 +10,10 @@
 	</select>
 
 
+	<update id="updateClusterTag" parameterType="ClusteringResult">
+	
+		update clustering_results set clustertagalias=#{cluster.clustertagalias} where 
+		clusteringbatchID=#{cluster.clusteringbatchID} and clustertag=#{cluster.clustertag}
+	
+	</update>
 </mapper>

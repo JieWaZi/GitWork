@@ -2,27 +2,33 @@ package com.secsc.controllers;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSON;
+import com.google.gson.Gson;
+import com.secsc.entity.ClusteringResult;
 import com.secsc.entity.DataAnalysisRecord;
 import com.secsc.entity.EnergyConsumptionStructure;
 import com.secsc.entity.PreProcessRecord;
-import com.secsc.entity.myUser;
+import com.secsc.mapper.ClusteringResultsMapper;
 import com.secsc.mapper.DataAnalysisMapper;
 import com.secsc.mapper.EnergyConsumptionStructureMapper;
 import com.secsc.mapper.PreProccessMapper;
 import com.secsc.security.AuthenticationInfo;
 import com.secsc.spark.SparkCommit;
+
 
 
 @RestController
@@ -34,6 +40,9 @@ public class DataAnalysisController {
 	
 	@Resource
 	private PreProccessMapper preProccessMapper;
+	
+	@Resource
+	private ClusteringResultsMapper clusteringResultsMapper;
 	
 	@Resource
 	private EnergyConsumptionStructureMapper energyConsumptionStructureMapper;
@@ -56,7 +65,7 @@ public class DataAnalysisController {
 		record.setTarget(datasource.substring(0, index));
 		System.out.println(datasource.substring(0, index));
 		System.out.println(datasource.substring(index+1));
-		if(datamethod.equals("通过均值法处理的数据")){
+		if("通过均值法处理的数据".equals(datamethod)){
 			record.setPreProccessMethod("averageDataPreProccess");
 			List<PreProcessRecord> list=preProccessMapper.queryRecordsByMethod(record);
 			datasourceuuid=list.get(0).getUuid();
@@ -72,14 +81,40 @@ public class DataAnalysisController {
 				webInfo.put("info", "Error");
 			}
 			webInfo.put("status", "0");
+			webInfo.put("uuid", uuid);
 			webInfo.put("info", "Finished");
 		} catch (Exception e) {
-			// TODO: handle exception
-			webInfo.put("status", "1");// code 0 for OK, 1 for coding error, others
-			webInfo.put("info", "Error");// Info key for information
+			// code 0 for OK, 1 for coding error, others
+			webInfo.put("status", "1");
+			// Info key for information
+			webInfo.put("info", "Error");
 		}
 
 		return webInfo;
+	}
+	
+	
+	
+	//聚类别名修改
+	@RequestMapping(value = "/clustering/modify/{uuid}", method = RequestMethod.POST)
+	public Map<String, Object> modifyClusterTag(String json,@PathVariable("uuid")String uuid){
+		Map<String, Object> map=new HashMap<String, Object>();
+		Set<String> tag=new HashSet<String>();
+		Map<String, String> map1	= (Map<String, String>) JSON.parse(json);
+		for (Map.Entry<String, String> entry:map1.entrySet()) {
+			ClusteringResult cr=new ClusteringResult();
+			cr.setClusteringbatchID(uuid);
+			cr.setClustertagalias(entry.getValue());
+			cr.setClustertag(entry.getKey().substring(2));
+			clusteringResultsMapper.updateClusterTag(cr);
+			System.out.println("key:"+entry.getKey()+"value:"+entry.getKey().substring(2));
+			tag.add(entry.getValue());
+		}
+		map.put("title", "聚类结果");
+		List<ClusteringResult> lists = clusteringResultsMapper.getClusteringResultById(uuid);
+		map.put("data", lists);
+		map.put("legend", tag);
+		return map;
 	}
 	
 	
