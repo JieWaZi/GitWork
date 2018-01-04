@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC   
+	    "-//mybatis.org//DTD Mapper 3.0//EN"  
+	    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	    
+<mapper namespace="com.secsc.mapper.AnalysisCategoryMapper">
+	
+	<select id="getAnalysisCategory" parameterType="String"  resultType="AnalysisCategory">
+		select * from analysis_category where analysistype=#{analysistype}
+	</select>
+
+	<insert id="insertAnalysisCategory" parameterType="AnalysisCategory">
+	
+		insert into analysis_category(analysistype,arithmetic,jarname,newname) values(#{analysis.analysisType},#{analysis.arithmetic},#{analysis.jarName},#{analysis.newName})
+	
+	</insert>
+
+
+	<select id="getAnalysisCategorys" resultType="AnalysisCategory">
+		select * from analysis_category order by id  desc
+	</select>
+	
+	<select id="selCount" resultType="Integer">
+		select count(*) from analysis_category order by id 
+	</select>
+</mapper>

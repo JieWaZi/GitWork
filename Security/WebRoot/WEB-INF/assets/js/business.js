@@ -583,45 +583,34 @@ $(function(){
 				updateDataAnalysis(body)
 			});
 			regListBtn(modal.find("a[role='listBtn5']").parents(".input-group"),5,function() {
+				updateArithmetic(modal,body,function(){})
 				updateDataAnalysis(body)
 				$(".input-grouptem").remove()
-				$("#params").append(
-						'		<div class="input-grouptem">' +
-						'			<div class="input-group-btn">' +
-						'			<input type="text"  class="form-control" style="width:100px" role="listBtnDisplay" value="领域半径值：" readonly="readonly"/>' +
-						'           <input type="text" name="param1" class="form-control" style="width:90px" role="listBtnDisplay" value="10" />'+
-						'			<input type="text"  class="form-control" style="width:120px" role="listBtnDisplay" value="领域密度阀值：" readonly="readonly"/>' +
-						'           <input type="text" name="param2" class="form-control" style="width:90px" role="listBtnDisplay" value="2" />'+
-						'			</div>' +
-						'		</div>' 
-				)
 			});
 			regListBtn(modal.find("a[role='listBtn6']").parents(".input-group"),6,function() {
+				updateArithmetic(modal,body,function(){})
 				updateDataAnalysis(body)
 				$(".input-grouptem").remove()
 			});
 			regListBtn(modal.find("a[role='listBtn7']").parents(".input-group"),7,function() {
+				updateArithmetic(modal,body,function(){})
 				updateDataAnalysis(body)
 				$(".input-grouptem").remove()
 			});
 			regListBtn(modal.find("a[role='listBtn8']").parents(".input-group"),8,function() {
+				updateArithmetic(modal,body,function(){})
 				updateDataAnalysis(body)
 			});
 			regListBtn(modal.find("a[role='listBtn9']").parents(".input-group"),9,function() {
+				updateArithmetic(modal,body,function(){})
 				updateDataAnalysis(body)
 			});
 			regListBtn(modal.find("a[role='listBtn10']").parents(".input-group"),10,function() {
+				updateArithmetic(modal,body,function(){})
 				updateDataAnalysis(body)
 			});
-			regListBtn(modal.find("a[role='listBtn11']").parents(".input-group"),11,function() {
-				updateDataAnalysis(body)
-			});
-			regListBtn(modal.find("a[role='listBtn12']").parents(".input-group"),12,function() {
-				updateDataAnalysis(body)
-			});
-			regListBtn(modal.find("a[role='listBtn13']").parents(".input-group"),13,function() {
-				updateDataAnalysis(body)
-			});
+			
+
 
 
 			$("input[name='year']").blur(function(){
@@ -643,8 +632,8 @@ $(function(){
 			'				<ul class="dropdown-menu">' +
 			'					<li class="dropdown-submenu"><a href="#" >企业基本信息</a>'+
 			'						<ul class="dropdown-menu">'+
-			'							<li><a href="#" role="listBtn13" list-value="企业基本信息/所有类别">所有类别</a></li>'+
-			'							<li><a href="#" role="listBtn1" list-value="企业基本信息/电力、热力生产和供应业">电力、热力生产和供应业</a></li>'+
+			'							<li><a href="#" role="listBtn1" list-value="企业基本信息/所有类别">所有类别</a></li>'+
+			'							<li><a href="#" role="listBtn2" list-value="企业基本信息/电力、热力生产和供应业">电力、热力生产和供应业</a></li>'+
 			'						</ul>'+
 			'					</li>' +
 			'					<li><a href="#" role="listBtn8" list-value="企业能源消费结构">企业能源消费结构</a></li>' +
@@ -657,8 +646,8 @@ $(function(){
 			'			<div class="input-group-btn">' +
 			'				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">选择数据处理类型  <span class="caret"></span></button>' +
 			'				<ul class="dropdown-menu">' +
-			'					<li><a href="#" role="listBtn9" list-value="通过均值法处理的数据">通过均值法处理的数据</a></li>' +
-			'					<li><a href="#" role="listBtn10" list-value="通过置零法处理的数据">通过置零法处理的数据</a></li>' +
+			'					<li><a href="#" role="listBtn3" list-value="通过均值法处理的数据">通过均值法处理的数据</a></li>' +
+			'					<li><a href="#" role="listBtn4" list-value="通过置零法处理的数据">通过置零法处理的数据</a></li>' +
 			'				</ul>' +
 			'			</div>' +
 			'			<input type="text" name="method" class="form-control" role="listBtnDisplay"   value="未选择" readonly="readonly"/>' +
@@ -679,10 +668,12 @@ $(function(){
 			'			<div class="input-group-btn">' +
 			'				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">选择数据分析类型 <span class="caret"></span></button>' +
 			'				<ul class="dropdown-menu">' +
-			'					<li><a href="#" role="listBtn2" list-value="聚类">聚类</a></li>' +
-			'					<li><a href="#" role="listBtn3" list-value="关联规则">关联规则</a></li>' +
-			'					<li><a href="#" role="listBtn4" list-value="预测分析">预测分析</a></li>' +
-			'					<li><a href="#" role="listBtn11" list-value="统计">统计</a></li>' +
+			'					<li><a href="#" role="listBtn5" list-value="聚类">聚类</a></li>' +
+			'					<li><a href="#" role="listBtn6" list-value="关联">关联规则</a></li>' +
+			'					<li><a href="#" role="listBtn7" list-value="回归">回归</a></li>' +
+			'					<li><a href="#" role="listBtn8" list-value="分类">分类</a></li>' +
+			'					<li><a href="#" role="listBtn9" list-value="离群点检测">离群点检测</a></li>' +
+			'					<li><a href="#" role="listBtn10" list-value="统计">统计</a></li>' +
 			'				</ul>' +
 			'			</div>' +
 			'			<input type="text" name="analysistype" class="form-control"  role="listBtnDisplay" value="未选择" readonly="readonly"/>' +
@@ -693,13 +684,9 @@ $(function(){
 			'	<h3>选择分析算法</h3>' +
 			'	<div class="col-sm-10 col-md-8 col-lg-6">' +
 			'		<div class="input-group">' +
-			'			<div class="input-group-btn">' +
+			'			<div class="input-group-btn" id="arithmeticgroup">' +
 			'				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">选择数据分析算法<span class="caret"></span></button>' +
 			'				<ul class="dropdown-menu">' +
-			'					<li><a href="#" role="listBtn5" list-value="DBSCAN">DBSCAN</a></li>' +
-			'					<li><a href="#" role="listBtn6" list-value="FPGrowth">FPGrowth</a></li>' +
-			'					<li><a href="#" role="listBtn7" list-value="预测">预测</a></li>' +
-			'					<li><a href="#" role="listBtn12" list-value="其他">其他</a></li>' +
 			'				</ul>' +
 			'			</div>' +
 			'			<input type="text" name="arithmetic" class="form-control" role="listBtnDisplay3" value="未选择" readonly="readonly"/>' +
@@ -722,6 +709,48 @@ $(function(){
 	}
 
 
+	
+	function updateArithmetic(modal,body,recallFunc){
+		var analysistype=$("input[name='analysistype']").val()
+		$.ajax({
+			url: 'analysisCategory/getArithmetic',
+			type: 'GET',
+			async: true,
+			dataType: 'json',
+			data:{"analysistype":analysistype},
+			success: function(result) {
+				template=""
+				$.each(result.data,function(i,item){
+					template=template+
+					'<li><a href="#" role="listBtn10'+item.id+'" list-value="'+item.arithmetic+'">'+item.arithmetic+'</a></li>'
+				})
+				$("#arithmeticgroup").find("ul").children().remove()
+				$("#arithmeticgroup").find("ul").append(template)
+				$.each(result.data,function(i,item){
+					regListBtn(modal.find("a[role='listBtn10"+item.id+"']").parents(".input-group"),"10"+item.id,function() {
+						updateDataAnalysis(body)
+						if(item.arithmetic=="DBSCAN"){
+							$("#params").append(
+							'		<div class="input-grouptem">' +
+							'			<div class="input-group-btn">' +
+							'			<input type="text"  class="form-control" style="width:100px" role="listBtnDisplay" value="领域半径值：" readonly="readonly"/>' +
+							'           <input type="text" name="param1" class="form-control" style="width:90px" role="listBtnDisplay" value="10" />'+
+							'			<input type="text"  class="form-control" style="width:120px" role="listBtnDisplay" value="领域密度阀值：" readonly="readonly"/>' +
+							'           <input type="text" name="param2" class="form-control" style="width:90px" role="listBtnDisplay" value="2" />'+
+							'			</div>' +
+							'		</div>' 
+					)
+						}
+					});
+				})
+	
+			},
+			error: function(data) {
+				recallFunc(data);
+			}
+		});
+	}
+	
 	function updateDataAnalysis(contentEle) {
 		var datasource = {};
 		var method = {};
@@ -1114,13 +1143,13 @@ $(function(){
 			
 			var data = [{
 				"name": "聚类",
-				"value": "clustering_results"
+				"value": "聚类"
 			},{
 				"name": "能源消费结构统计",
-				"value": "energy_consumption_results"
+				"value": "能源消费结构统计"
 			},{
 				"name": "其他",
-				"value": "other"
+				"value": "其他"
 			}];
 			fillListBtnList($("#newReportDataSource").children(".input-group"), data);
 			$("#newReportDataSource").children("div:last").after("<br /><div class='col-sm-12'></div>");

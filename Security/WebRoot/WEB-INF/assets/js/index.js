@@ -169,6 +169,7 @@ $(function(){
 			//		'	<li class="dropdown-header">面板选择</li>' +
 			'	<li ><a href="index" role="switchPanelBtn" style="color:#FFF;">报告面板</a></li>' +
 			'	<li ><a href="business" role="switchPanelBtn" style="color:#FFF;">业务面板</a></li>' +
+			'	<li ><a href="manage" role="switchPanelBtn" style="color:#FFF;">管理面板</a></li>' +
 			'	<li role="separator" class="divider"></li>' +
 			'	<li><a href="logout" cus-role="logoutBtn" style="color:#FFF;">注销登录</a></li>' +
 			'</ul>';
@@ -274,34 +275,43 @@ function ajaxContents() {
 					} else {
 						$.each(reports, function(i, report) {
 							var diagramThumbnailUUID = report.diagramUuid;
+							var title =report.title
 							if(href == '#outline') {
 								$(href+"Content").append("<div class='col-sm-12 col-md-6' id='" + diagramThumbnailUUID + "' style='height:300px;'></div>");
 								var diagramEle = $("#" + diagramThumbnailUUID);
-								ajaxRequestOfOutline(i, function(option) {
+								ajaxRequestOfOutline(diagramThumbnailUUID, function(data) {
 									var axisLine = {
-										lineStyle: {
-											color: 'lightgray',
-											width: 2, //这里是为了突出显示加上的
-										}
-									};
-									// 使用if确保option中具有完整的相关对象
-									if(option.xAxis != null) {
-										option.xAxis[0]['axisLine'] = axisLine;
-									}
-									if(option.yAxis != null) {
-										option.yAxis[0]['axisLine'] = axisLine;
-									}
-									if(option.legend != null) {
-										option.title['textStyle'] = {
-											'color': 'white'
+											lineStyle: {
+												color: 'lightgray',
+												width: 2, //这里是为了突出显示加上的
+											}
 										};
-									}
-									if(i==0){
-										option.grid['top']='24%'
-										option.legend['textStyle']={
-												color: '#FFFFFF'
+									var option={}
+									if(data.chart=="cluster"){
+										var json=clusterOption(data)
+										json.xAxis[0]['axisLine'] = axisLine;
+										json.yAxis[0]['axisLine'] = axisLine;
+										json.legend['orient']=='horizontal'
+										option = json
+									}else if(data.chart=="bar"){
+										option=data.option
+										// 使用if确保option中具有完整的相关对象
+										if(option.xAxis != null) {
+											option.xAxis[0]['axisLine'] = axisLine;
+										}
+										if(option.yAxis != null) {
+											option.yAxis[0]['axisLine'] = axisLine;
+										}
+										if(option.legend != null) {
+											option.title['textStyle'] = {
+												'color': 'white'
+											};
 										}
 									}
+									option.grid['top']='24%'
+									option.legend['textStyle']={color: '#FFFFFF'}
+
+										
 									console.log(option);
 									addDiagram(diagramEle, false, option);
 								});
@@ -645,12 +655,18 @@ function clusterOption(data){
 	var list=data.data
 	var serie=[]
 	$.each(list, function(i, item) {
+		var tag=""
+		if(item.clustertagalias!=null||item.clustertagalias!=""){
+			tag=item.clustertagalias
+		}else{
+			tag=item.clustertag
+		}
 		template={
 	        		large: true,
-	        		name: item.clustertag,
+	        		name: tag,
 	        		type: 'scatter',
 	        		symbolSize: 5,
-	        		data: [[item.x2D,item.y2D,item.clustertag,item.companyName]]
+	        		data: [[item.x2D,item.y2D,item.clustertag,item.clustertagalias,item.companyName]]
 	   			},
 	    serie.push(template)
 	})
@@ -659,6 +675,7 @@ function clusterOption(data){
 	        backgroundColor: 'transparent',
 		    title : {
 		        text: title,
+		        textStyle:{color:'#fff'}
 		    },
 		    grid: {
 		        left: '3%',
@@ -668,8 +685,8 @@ function clusterOption(data){
 		    },
 		    tooltip : {
 		        showDelay : 20,
-		        formatter : function (params) {return '公司名称：'+params.value[3]+'</br>所属类别：'
-		        			+params.value[2]+'</br>单位增加值能耗：'+params.value[0]+'</br>能源消费占总成本比：'
+		        formatter : function (params) {return '公司名称：'+params.value[4]+'</br>所属类别：'
+		        			+params.value[2]+'('+params.value[3]+')</br>单位增加值能耗：'+params.value[0]+'</br>能源消费占总成本比：'
 		        			+params.value[1]+'</br>'},
 		        axisPointer:{
 		            show: false,
@@ -715,12 +732,18 @@ function clusterOption(data){
 	        show: true,
 	        right: 40
 		    },
-		    
+		    grid:{
+		    	bottom:12,
+		    	containLabel:true,
+		    	left:3,
+		    	right:4
+		    },
 		    legend: {
-		        data: [data.legend],
-		        orient: 'vertical',
-		        x: 'right',
-		        y: 60
+		        data: data.legend,
+		        orient: 'horizontal',
+		        x: 'center',
+		        y: 'top',
+		        top:'35px'
 		    },
 		    xAxis : [
 		        {

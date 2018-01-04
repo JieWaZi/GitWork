@@ -48,7 +48,7 @@ public class CompanyInformationTest {
 		SqlSession session = sqlSessionFactory.openSession(); 
 		CompanyInformationMapper companyInformationMapper=session.getMapper(CompanyInformationMapper.class);
         ExcelUtil excelUtil=new ExcelUtil();
-        excelUtil.readExcelFile(new File("D://电力、热力生产和供应业.xlsx"));
+        excelUtil.readExcelFile(new File("E://数据//基本信息.xlsx"));
         DataTable dataTable=excelUtil.getContentOfSheet("企业基本信息");
         List<Object[]> list=dataTable.getData();
         List<CompanyInformation> comlist=new ArrayList<CompanyInformation>();
@@ -58,11 +58,12 @@ public class CompanyInformationTest {
 				continue;
 			}else {
 	        	code=(String) objects[2];
+	        	System.out.println(code);
 	        	CompanyInformation companyInformation=new CompanyInformation();
 	        	companyInformation.setCompanyName((String)objects[1]);
 	        	companyInformation.setLegalPersonCode((String)objects[2]);
 	        	companyInformation.setIndustrySmall((String)objects[4]);
-	        	companyInformation.setIndustrySort("电力、热力生产和供应业");
+	        	//companyInformation.setIndustrySort("电力、热力生产和供应业");
 	        	companyInformation.setAddress((String)objects[5]);
 	        	comlist.add(companyInformation);
 			}

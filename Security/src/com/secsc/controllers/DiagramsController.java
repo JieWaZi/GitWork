@@ -65,6 +65,16 @@ public class DiagramsController {
 		map.put("title", diagram.getTitle());
 		List<ClusteringResult> lists = clusteringResultsMapper.getClusteringResultById(diagram.getDatasourceUuid());
 		map.put("data", lists);
+		Set<String> tag=new HashSet<String>();
+		for (ClusteringResult cr : lists) {
+			if (cr.getClustertagalias()!=null&&!"".equals(cr.getClustertagalias())) {
+				tag.add(cr.getClustertagalias());
+			}else {
+				tag.add(cr.getClustertag());
+			}
+			
+		}
+		map.put("legend", tag);
 		return map;
 	}
 	
@@ -90,20 +100,25 @@ public class DiagramsController {
 	
 	//总览图表
 	@RequestMapping(value = "/overview/{i}/", method = RequestMethod.GET)
-	public Option getOverView(@PathVariable("i") String i){
+	public Map<String, Object> getOverView(@PathVariable("i") String i){
 		Diagram diagram = diagramsMapper.getDiagramById(i);
+		Map<String, Object> map=new HashMap<String, Object>();
 		Option option = null;
 		switch (diagram.getDiagramType()) {
 		case "ClusterScatterChart":
-			option = _getClusterScatterChart(diagram);
+			map=getResultClusterData(diagram.getDatasourceUuid());
+			map.put("chart", "cluster");
+			map.put("title", diagram.getTitle());
 			break;
 		case "BarChart":
 			option = _getStackBarEntity(diagram);
+			map.put("option", option);
+			map.put("chart", "bar");
 			break;
 		default:
 			break;
 		}
-		return option;
+		return map;
 	}
 
 	private Option _getClusterScatterChart(Diagram diagram) {
