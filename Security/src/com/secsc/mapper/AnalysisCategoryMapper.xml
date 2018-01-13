@@ -23,4 +23,15 @@
 	<select id="selCount" resultType="Integer">
 		select count(*) from analysis_category order by id 
 	</select>
+	
+	<delete id="deleteAnalysisCategory" parameterType="String">
+		
+		delete from analysis_category where arithmetic=#{arithmetic}
+	</delete>
+	
+	<select id="getArithmeticJar" parameterType="String" resultType="String">
+		select newname from analysis_category where arithmetic=#{arithmetic}
+	</select>
+	
+	
 </mapper>

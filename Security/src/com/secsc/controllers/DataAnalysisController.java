@@ -22,6 +22,7 @@ import com.secsc.entity.ClusteringResult;
 import com.secsc.entity.DataAnalysisRecord;
 import com.secsc.entity.EnergyConsumptionStructure;
 import com.secsc.entity.PreProcessRecord;
+import com.secsc.mapper.AnalysisCategoryMapper;
 import com.secsc.mapper.ClusteringResultsMapper;
 import com.secsc.mapper.DataAnalysisMapper;
 import com.secsc.mapper.EnergyConsumptionStructureMapper;
@@ -49,6 +50,9 @@ public class DataAnalysisController {
 	
 	@Resource(name="authInfo")
 	private AuthenticationInfo authenticationInfo;
+	
+	@Resource
+	private AnalysisCategoryMapper analysisCategoryMapper;
 
 
 
@@ -60,6 +64,9 @@ public class DataAnalysisController {
 		Map<String, String> webInfo = new HashMap<String, String>();
 		String datasourceuuid="";
 		String jarpath=session.getServletContext().getRealPath("/")+"/WEB-INF/lib/";
+		jarpath=jarpath+analysisCategoryMapper.getArithmeticJar(arithmetic)+".jar";
+		String addjar=session.getServletContext().getRealPath("/")+"/WEB-INF/lib/"+"";
+		addjar=addjar+"mysql-connector-java-5.1.37.jar";
 		PreProcessRecord record=new PreProcessRecord();
 		int index=datasource.indexOf("/");
 		record.setTarget(datasource.substring(0, index));
@@ -75,7 +82,7 @@ public class DataAnalysisController {
 		dataAnalysisMapper.insertDataAnalysisRecord(new DataAnalysisRecord(uuid,  LocalDateTime.now(), method,arithmetic, datasourceuuid, datasource.substring(index+1),username));
 		try {
 			try {
-				SparkCommit.clusteringOperation(datasource.substring(index+1),jarpath,datasourceuuid, uuid, year, arithmetic, param);
+				SparkCommit.clusteringOperation(datasource.substring(index+1),addjar,jarpath,datasourceuuid, uuid, year, arithmetic, param);
 			} catch (Exception e) {
 				webInfo.put("status", "1");
 				webInfo.put("info", "Error");

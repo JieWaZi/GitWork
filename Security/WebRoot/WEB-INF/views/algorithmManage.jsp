@@ -74,15 +74,38 @@
                     						"<td>" + (data.data)[i+(currPage-1)*5].arithmetic + "</td>" +
                     						"<td>" + (data.data)[i+(currPage-1)*5].jarName + "</td>" +
                     						"<td>"+
-                    						"<button type='button' class=' btn btn-success btn-xs' aria-label='Left Align'>"+
+/*                     						"<button type='button' class=' btn btn-success btn-xs' aria-label='Left Align'>"+
                     							"更新&nbsp;&nbsp<span class='glyphicon glyphicon-cog' aria-hidden='true'></span>"+
-                    						"</button>"+
+                    						"</button>"+ */
                     						"<button style='margin-left:20px' type='button' class='btn btn-danger btn-xs' aria-label='Left Align'>"+
                     							"删除&nbsp;&nbsp<span class='glyphicon glyphicon-trash' aria-hidden='true'></span>"+
                     						"</button>"+
                     						"</td></tr>");
                     				if(i>=length-1) return false
                     			});
+                    			
+                    			//删除
+                    			$("button[name='jardelete']").click(function(){
+                    				var arithmetic=$(this).parent().prev().prev().html()
+                    				 if (confirm("你确定将其删除吗？")) {  
+                    					 $.ajax({
+                    							url: 'upload/deletejars',
+                    							type: 'POST',
+                    							async: true,
+                    							data:{"arithmetic":arithmetic},
+                    							dataType: 'json',
+                    							success: function(returndata) {
+                    								alert("该算法已删除")
+                    								window.location.reload()
+                    							},
+                    							error: function(returndata) {
+                    							}
+                    						}) 
+                    			        }  
+                    			        else {   
+                    			        }  
+                    			})
+                    			
                                }
                            }
                        })

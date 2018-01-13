@@ -15,4 +15,8 @@ public interface AnalysisCategoryMapper {
 	public List<AnalysisCategory> getAnalysisCategorys();
 	
 	public int selCount();
+	
+	public void deleteAnalysisCategory(@Param("arithmetic") String arithmetic);
+	
+	public String getArithmeticJar(@Param("arithmetic") String arithmetic);
 }

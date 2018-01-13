@@ -2,6 +2,7 @@ package com.secsc.controllers;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -105,6 +106,15 @@ public class UploadController {
 	public List<AnalysisCategory> getUploadJars(UploadRecord uploadRecord){
 		return analysisCategoryMapper.getAnalysisCategorys();
 		
+	}
+	
+	
+	@RequestMapping(value = "/deletejars", method = RequestMethod.POST)
+	public List<AnalysisCategory> deleteJars(String arithmetic){
+		
+		analysisCategoryMapper.deleteAnalysisCategory(arithmetic);
+		
+		return new ArrayList<AnalysisCategory>();
 	}
 	
 	//获取后缀名
