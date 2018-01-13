@@ -169,7 +169,7 @@ $(function(){
 			//		'	<li class="dropdown-header">面板选择</li>' +
 			'	<li ><a href="index" role="switchPanelBtn" style="color:#FFF;">报告面板</a></li>' +
 			'	<li ><a href="business" role="switchPanelBtn" style="color:#FFF;">业务面板</a></li>' +
-			'	<li ><a href="manage" role="switchPanelBtn" style="color:#FFF;">管理面板</a></li>' +
+			'	<li ><a href="algorithmManage" role="switchPanelBtn" style="color:#FFF;">管理面板</a></li>' +
 			'	<li role="separator" class="divider"></li>' +
 			'	<li><a href="logout" cus-role="logoutBtn" style="color:#FFF;">注销登录</a></li>' +
 			'</ul>';

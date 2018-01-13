@@ -30,11 +30,18 @@ public class ViewController {
 		return "redirect:/";
 	}
 	
-	@RequestMapping("/manage")
-	public String manage(Model model){
+	@RequestMapping("/algorithmManage")
+	public String algorithmManage(Model model){
 		Page page=pageService.selAll(1);
 		model.addAttribute("page",page);
-		return "manage";
+		return "algorithmManage";
+	}
+	
+	@RequestMapping("/accountManage")
+	public String accountManage(Model model){
+		Page page=pageService.selAllAccount(1);
+		model.addAttribute("page", page);
+		return "accountManage";
 	}
 	
 	
@@ -44,5 +51,20 @@ public class ViewController {
 		Page page=pageService.selAll(count);
 		return page;
 	}
+	
+	@RequestMapping("/pageAccount")
+	@ResponseBody
+	public Page pageAccount(Integer count){
+		Page page=pageService.selAllAccount(count);
+		return page;
+	}
+	
+	@RequestMapping("/pageAccountById")
+	@ResponseBody
+	public Page pageAccountById(Integer count,String username){
+		Page page=pageService.selAccountById(count, username);
+		return page;
+	}
+	
 	
 }

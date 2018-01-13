@@ -669,7 +669,7 @@ $(function(){
 			'				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">选择数据分析类型 <span class="caret"></span></button>' +
 			'				<ul class="dropdown-menu">' +
 			'					<li><a href="#" role="listBtn5" list-value="聚类">聚类</a></li>' +
-			'					<li><a href="#" role="listBtn6" list-value="关联">关联规则</a></li>' +
+			'					<li><a href="#" role="listBtn6" list-value="关联规则">关联规则</a></li>' +
 			'					<li><a href="#" role="listBtn7" list-value="回归">回归</a></li>' +
 			'					<li><a href="#" role="listBtn8" list-value="分类">分类</a></li>' +
 			'					<li><a href="#" role="listBtn9" list-value="离群点检测">离群点检测</a></li>' +

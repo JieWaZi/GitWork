@@ -39,6 +39,7 @@
 <script type="text/javascript">
 	$(function(){
 		var element = $('#myPage');
+		var user
         var options = {
             bootstrapMajorVersion:3,//如果是bootstrap3版本需要加此标识，并且设置包含分页内容的DOM元素为UL,如果是bootstrap2版本，则DOM包含元素是DIV
             currentPage: ${page.currPage},    //设置当前页，默认起始页为第一页
@@ -47,10 +48,10 @@
             /*  useBootstrapTooltip:'true',    //是否显示tip提示框 */
             onPageClicked: function (event, originalEvent, type, page) {
                    $.ajax({
-                         url:'page?count='+page, //点击分页提交当前页码
+                         url:'pageAccount?count='+page, //点击分页提交当前页码
                           success:function(data){
                                if(data!=null){
-                            	$("#arithmeticHistory").children("tbody").empty();
+                            	$("#accountHistory").children("tbody").empty();
                     			var currPage=data.currPage
                     			var totalPage=data.totalPage
                     			var datalength=data.data.length
@@ -68,15 +69,18 @@
 
                     			
                     			$.each(data.data, function(i, item) {
-                    				$("#arithmeticHistory").children("tbody")
+                    				$("#accountHistory").children("tbody")
                     					.append("<tr>" +
-                    						"<td>" + (data.data)[i+(currPage-1)*5].analysisType+"</td>" +
-                    						"<td>" + (data.data)[i+(currPage-1)*5].arithmetic + "</td>" +
-                    						"<td>" + (data.data)[i+(currPage-1)*5].jarName + "</td>" +
+                    						"<td>" + (data.data)[i+(currPage-1)*5].username+"</td>" +
+                    						"<td>" + (data.data)[i+(currPage-1)*5].password + "</td>" +
+                    						"<td>" + (data.data)[i+(currPage-1)*5].accountNonLocked + "</td>" +
                     						"<td>"+
                     						"<button type='button' class=' btn btn-success btn-xs' aria-label='Left Align'>"+
-                    							"更新&nbsp;&nbsp<span class='glyphicon glyphicon-cog' aria-hidden='true'></span>"+
+                    							"编辑&nbsp;&nbsp<span class='glyphicon glyphicon-cog' aria-hidden='true'></span>"+
                     						"</button>"+
+                    						"<button style='margin-left:20px' name='nameDelete' type='button' class='btn btn-info btn-xs' aria-label='Left Align'>"+
+                								"解锁&nbsp;&nbsp<span class='glyphicon glyphicon-trash' aria-hidden='true'></span>"+
+                							"</button>"+
                     						"<button style='margin-left:20px' type='button' class='btn btn-danger btn-xs' aria-label='Left Align'>"+
                     							"删除&nbsp;&nbsp<span class='glyphicon glyphicon-trash' aria-hidden='true'></span>"+
                     						"</button>"+
@@ -113,9 +117,9 @@
 
 <body style="padding-top: 10em;background-color:#FFFFF;" data-spy="scroll"
 	data-target="#sideBar2" data-offset="140">
-	<div id="modalDiaglog" class="modal fade bs-example-modal-lg"
+	<div id="modalDiaglog" class="modal fade bs-example-modal-md"
 		tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
-		<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-dialog modal-md" role="document">
 			<div class="modal-content">
 				<button type="button" style="margin-top: 1em;margin-right: 1em;"
 					class="btn btn-danger pull-right" data-dismiss="modal">X</button>
@@ -124,7 +128,8 @@
 				<div class="modal-body">
 					<div class="row">
 						<div class="col-sm-12"
-							style="text-align: center;font-size: xx-large;"></div>
+							style="text-align: center;font-size: xx-large;">
+						</div>
 					</div>
 				</div>
 				<div class="modal-footer" hidden="hidden"></div>
@@ -193,81 +198,40 @@
 				</ul>
 			</div>
 		</div>
-	</nav>
+	</nav>		
+	
 
-	<!-- 上传模板 -->
-	<div id="arithmetic" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-		<h1 class="page-header">
-			<span> 算法上传</span> 
-		</h1>
-		<div id="arithmeticContent" role="content-panel" class="row"  style="margin-top: 24px">
-			<div class="btn-group btn-group-justified" role="group">
-			<form id="uploadForm1" enctype="multipart/form-data">
-				<div class="col-lg-6 col-sm-12">
-					<div class="input-group">
-						<div class="input-group-btn">
-							<button type="button" class="btn btn-default dropdown-toggle"
-								data-toggle="dropdown" aria-haspopup="true"
-								aria-expanded="false">
-								选择类别<span class="caret"></span>
-							</button>
-							<ul class="dropdown-menu">
-								<li><a href="javascript:void(0)" role="listBtn1"
-									list-value="聚类">聚类</a></li>
-								<li><a href="javascript:void(0)" role="listBtn2"
-									list-value="关联">关联规则</a></li>
-								<li><a href="javascript:void(0)" role="listBtn3"
-									list-value="回归">回归</a></li>
-								<li><a href="javascript:void(0)" role="listBtn4"
-									list-value="分类">分类</a></li>
-								<li><a href="javascript:void(0)" role="listBtn5"
-									list-value="离群点检测">离群点检测</a></li>
-							</ul>
-						</div>
-						<input type="text" role="listBtnDisplay" name="uploadTarget"
-							class="form-control" value="未选择" readonly="readonly" />
-					</div>
-				</div>
-				<div class="col-lg-6 col-sm-12">
-					<div class="input-group">
-						<span class="input-group-addon" id="basic-addon1">输入算法名称：</span> <input
-							type="text" name="arithmeticName" class="form-control"
-							aria-describedby="basic-addon1">
-					</div>
-				</div>
-				<div class="col-lg-6 col-sm-12">
-					<input type="file" style="margin-top:15px" accept=".jar"
-						class="btn btn-default" name="file" />
-				</div>
-				<div class="col-lg-6 col-sm-12">
-					<input type="submit" style="margin-top:15px" class="btn btn-default"
-						value="开始上传" disabled="disabled" />
-				</div>
-				<div class="col-lg-12 col-sm-12" style="margin-top:15px;">
-					<div role="uploadTip" class="alert alert-info">提示：未选择文件</div>
-				</div>
-			</form>
-		</div>
-		</div>
+		 <div class="row">
+		 <div class="col-md-1 col-sm-offset-2   main"><span style="font-size: 124%;line-height: 2;" class="label label-default">输入需要查询的ID号:</span></div>
+		  <div class="col-md-3 col-sm-offset-1 main">
+		    <div class="input-group">
+		      <input type="text" name="username" class="form-control">
+		      <span class="input-group-btn">
+		        <button id="searchUser" class="btn btn-primary" type="button">查询</button>
+		      </span>
+		    </div><!-- /input-group -->
+		  </div><!-- /.col-lg-6 -->
+		  <div class="col-md-1  main" >
+				<a href="#" role="newaccount" class="btn btn-primary pull-right" data-toggle="modal"
+					data-target="#modalDiaglog">新建账号＋ </a>
+			</div>
+		</div><!-- /.row -->
 		
+					
 		
-		
-		<div class="page-header"></div>
-		
-		
-		<div id="arithmeticContent" role="content-panel" class="row" >
-			<div class="col-sm-12">
-
-				<h3 style="margin-top:0.2em;">上传历史记录：</h3>
-				<table id="arithmeticHistory" class="table table-hover" >
+		<div id="accountContent" role="content-panel" class="row" >
+			<div class="col-sm-offset-2 col-md-9  main">
+				<h3 style="margin-top:0.2em;">账户信息：</h3>
+				<table id="accountHistory" class="table table-hover" >
 					<thead>
 						<tr>
-							<td>上传类别</td>
-							<td>算法名称</security:authentication> </td>
-							<td>jar包名</td>
+							<td>用户名</td>
+							<td>密码</td>
+							<td>是否正常（未被锁）</td>
 							<td>操作</td>
 						</tr>
 						<tr>
+
 					</thead>
 					<tbody>
 						<tr class="info">
@@ -278,8 +242,7 @@
 			</div>
 		</div>
 		
-	<div class="col-sm-12" style="text-align:center">	<ul id="myPage"></ul> </div>
-		
+	<div class="col-md-12" style="text-align:center">	<ul id="myPage"></ul> </div>
 	</div>
 
 
@@ -291,7 +254,8 @@
 			<div id="sideBar1" class="col-sm-3 col-md-2 sidebar"
 				style="margin-top:1.6em;background-color:#e9ecf3;border-right-color: rgba(255, 255, 255, 0.15);">
 				<ul class="nav nav-sidebar" role="tablist" style="margin-top: 1em;">
-					<li class="active"><a role="sideNav" href="manage" style="width: 93%;margin-left: 4%;">算法管理</a><span class="sr-only"></span></li>
+					<li ><a role="sideNav" href="algorithmManage" style="width: 93%;margin-left: 4%;">算法管理</a><span class="sr-only"></span></li>
+					<li class="active"><a role="sideNav" href="accountManage" style="width: 93%;margin-left: 4%; margin-top:25px">账号管理</a></li>
 				</ul>
 			</div>
 		<div>

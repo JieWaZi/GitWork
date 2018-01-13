@@ -114,6 +114,15 @@ $(function(){
 			displayUploadRecords(data, $("#arithmeticHistory"));
 		});
 		
+		ajaxQueryAccounts(function(data) {
+			uploaddata=data
+			displayAccountRecords(data, $("#accountHistory"));
+		});
+		
+		
+		
+		
+		
 		//注册a标签监听，在选中后更改相关信息
 		regListBtn($("#uploadForm1").find("a[role='listBtn1']").parents(".input-group"),1, function() {});
 		regListBtn($("#uploadForm1").find("a[role='listBtn2']").parents(".input-group"),2, function() {});
@@ -190,6 +199,187 @@ $(function(){
 		}
 		
 		
+		//显示用户信息
+		function displayAccountRecords(data, displayTableEle) {
+			displayTableEle.children("tbody").empty();
+			var currPage=data.currPage
+			var totalPage=data.totalPage
+			var datalength=data.data.length
+			var length=0
+			if(datalength <= 0) {
+				displayTableEle.children("tbody").html("<tr class='info'><td colspan='999' style='text-align:center;font-weight:bold;color:#333'>没有上传记录</td></tr>");
+			}
+			else if(datalength<=5){
+				length=data.data.length
+			}else if(totalPage == currPage){
+				length=data.data.length%5
+			}else{
+				length=5
+			}
+
+			
+			$.each(data.data, function(i, item) {
+				displayTableEle.children("tbody")
+					.append("<tr>" +
+						"<td>" + (data.data)[i+(currPage-1)*5].username+"</td>" +
+						"<td>" + (data.data)[i+(currPage-1)*5].password + "</td>" +
+						"<td>" + (data.data)[i+(currPage-1)*5].accountNonLocked + "</td>" +
+						"<td>"+
+						"<button type='button' name='nameModify' class=' btn btn-success btn-xs' aria-label='Left Align'>"+
+							"编辑&nbsp;&nbsp<span class='glyphicon glyphicon-cog' aria-hidden='true'></span>"+
+						"</button>"+
+						"<button style='margin-left:20px' name='unlock' type='button' class='btn btn-info btn-xs' aria-label='Left Align'>"+
+							"解锁&nbsp;&nbsp<span class='glyphicon glyphicon-trash' aria-hidden='true'></span>"+
+						"</button>"+
+						"<button style='margin-left:20px' name='nameDelete' type='button' class='btn btn-danger btn-xs' aria-label='Left Align'>"+
+							"删除&nbsp;&nbsp<span class='glyphicon glyphicon-trash' aria-hidden='true'></span>"+
+						"</button>"+
+						"</td></tr>");
+				if(i>=length-1) return false
+			});
+			
+			//更新用户
+			$("button[name='nameModify']").click(function(){
+				var name=$(this).parent().prev().prev().prev().html()
+				var modal = $('#modalDiaglog');
+				var title = modal.find('.modal-header');
+				var body = modal.find('.modal-body');
+				var footer = modal.find('.modal-footer');
+				title.text("修改用户密码");
+				body.children().remove()
+				footer.children().remove()
+				var template=
+				'<div class="row">'+
+				'	<div class="col-sm-2" style="margin-top:20px"></div>'+
+				'	<div class="col-sm-8" style="margin-top:20px">'+
+				'		<div class="input-group">'+
+				'  			<span class="input-group-addon" id="basic-addon1">用户名</span>'+
+				'  			<input type="text" readonly name="name" class="form-control" value="'+name+'"/>'+
+				'		</div>'+
+				'	</div>'+
+				'</div>'+
+				'<div class="row">'+
+				'	<div class="col-sm-2" style="margin-top:20px"></div>'+
+				'	<div class="col-sm-8" style="margin-top:40px">'+
+				'		<div class="input-group">'+
+				'  			<span class="input-group-addon" id="basic-addon1">新密码：</span>'+
+				'  			<input type="text" name="password" class="form-control" />'+
+				'		</div>'+
+				'	</div>'+
+				'</div>'+
+				'<div class="row">'+
+				'	<div class="col-sm-2" style="margin-top:20px"></div>'+
+				'	<div class="col-sm-8" style="margin-top:40px">'+
+				'		<div class="input-group">'+
+				'  			<span class="input-group-addon" id="basic-addon1">确认密码：</span>'+
+				'  			<input type="text"  name="repassword" class="form-control" />'+
+				'		</div>'+
+				'	</div>'+
+				'	<div class="col-sm-1" style="margin-top:20px">'+
+				'			<h3><span style="margin-left:-27px"  class="label label-danger" id="wrong"></span></h3></div>'+
+				'</div>'+
+				'<div class="row">'+
+				'	<div class="col-sm-2 col-sm-offset-5" style="margin-top:20px">'+
+				'			<h3><span style="margin-left:-27px"  class="label label-success" id="success"></span></h3>'+
+				'	</div>'+
+				'</div>'+
+				'<div class="row">'+
+				'	<div class="col-sm-2 col-sm-offset-5" style="margin-top:20px">'+
+				'		<input type="button" id="modiryname" class="btn btn-primary" value="确定修改"/>'+
+				'	</div>'+
+				'</div>'
+				body.append(template)
+				modal.modal('show')
+				
+				$("#modiryname").click(function(){
+					var name=$("input[name='name']").val()
+					var password=$("input[name='password']").val()
+					var repassword=$("input[name='repassword']").val()
+					if(password==repassword){
+						$.ajax({
+							url: 'login/modify',
+							type: 'PUT',
+							async: true,
+							data:{
+								"username":name,
+								"password":password
+							},
+							dataType: 'json',
+							success: function(returndata) {
+								$("#success").html("修改成功")
+							},
+							error: function(returndata) {
+							}
+						})
+					}else{
+						$("#wrong").html("密码不正确")
+					}
+
+				})
+				
+			})
+			
+			
+			//解锁
+			$("button[name='unlock']").click(function(){
+				var name=$(this).parent().prev().prev().prev().html()
+				var flag=$(this).parent().prev().html()
+				if(flag){
+					alert("该账户已处于未锁状态，无需解锁！！")
+				}else{
+					 if (confirm("你确定将其解锁吗？")) {  
+						 $.ajax({
+								url: 'login/unlock',
+								type: 'PUT',
+								async: true,
+								data:{"username":name},
+								dataType: 'json',
+								success: function(returndata) {
+									alert("该账号已解锁")
+									window.location.reload()
+								},
+								error: function(returndata) {
+								}
+							}) 
+				        }  
+				        else {   
+				        }  
+				}
+		
+			})
+			
+			//删除
+			$("button[name='nameDelete']").click(function(){
+				var name=$(this).parent().prev().prev().prev().html()
+				 if (confirm("你确定将其删除吗？")) {  
+					 $.ajax({
+							url: 'login/delete',
+							type: 'POST',
+							async: true,
+							data:{"username":name},
+							dataType: 'json',
+							success: function(returndata) {
+								alert("该账号已删除")
+								window.location.reload()
+							},
+							error: function(returndata) {
+							}
+						}) 
+			        }  
+			        else {   
+			        }  
+			})
+			
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		//检查文件的拓展名
 		function checkFileExt(filename, typeArr) {
 			var flag = false; //状态
@@ -241,6 +431,21 @@ $(function(){
 			});
 		}
 		
+		function ajaxQueryAccounts(recallFunc) {
+			$.ajax({
+				url: 'pageAccount?count=1',
+				type: 'GET',
+				async: true,
+				dataType: 'json',
+				success: function(returndata) {
+					recallFunc(returndata);
+				},
+				error: function(returndata) {
+					ajaxError(returndata);
+				}
+			});
+		}
+		
 		
 		
 		//等待动画
@@ -264,6 +469,167 @@ $(function(){
 				'</div>';
 			return temple;
 		}
+		
+		
+		
+		//查询按钮
+		
+		$("#searchUser").click(function(){
 			
-	
+			var username=$("input[name='username']").val()
+			
+			$.ajax({
+				url: 'pageAccountById?count=1&username='+username,
+				type: 'GET',
+				async: true,
+				dataType: 'json',
+                success:function(data){
+                    if(data!=null){
+                 	$("#accountHistory").children("tbody").empty();
+         			var currPage=data.currPage
+         			var totalPage=data.totalPage
+         			var datalength=data.data.length
+         			var length=0
+         			if(datalength <= 0) {
+         				$("#accountHistory").children("tbody").html("<tr class='info'><td colspan='999' style='text-align:center;font-weight:bold;color:#333'>没有相关记录</td></tr>");
+         			}
+         			else if(datalength<=5){
+         				length=data.data.length
+         			}else if(totalPage == currPage){
+         				length=data.data.length%5
+         			}else{
+         				length=5
+         			}
+         			$.each(data.data, function(i, item) {
+         				$("#accountHistory").children("tbody")
+         					.append("<tr>" +
+         						"<td>" + (data.data)[i+(currPage-1)*5].username+"</td>" +
+         						"<td>" + (data.data)[i+(currPage-1)*5].password + "</td>" +
+         						"<td>" + (data.data)[i+(currPage-1)*5].accountNonLocked + "</td>" +
+         						"<td>"+
+         						"<button type='button' name='nameModify' class=' btn btn-success btn-xs' aria-label='Left Align'>"+
+         							"编辑&nbsp;&nbsp<span class='glyphicon glyphicon-cog' aria-hidden='true'></span>"+
+         						"</button>"+
+        						"<button style='margin-left:20px' name='nameDelete' type='button' class='btn btn-info btn-xs' aria-label='Left Align'>"+
+    							"解锁&nbsp;&nbsp<span class='glyphicon glyphicon-trash' aria-hidden='true'></span>"+
+    							"</button>"+
+         						"<button style='margin-left:20px' type='button' class='btn btn-danger btn-xs' aria-label='Left Align'>"+
+         							"删除&nbsp;&nbsp<span class='glyphicon glyphicon-trash' aria-hidden='true'></span>"+
+         						"</button>"+
+         						"</td></tr>");
+         				if(i>=length-1) return false
+         			});
+                    }
+                }
+				
+			})
+		})
+		
+		
+		
+		//新建账户
+		
+		$("a[role='newaccount']").click(function(){
+			var modal = $('#modalDiaglog');
+			var title = modal.find('.modal-header');
+			var body = modal.find('.modal-body');
+			var footer = modal.find('.modal-footer');
+			title.text("新建账户");
+			body.children().remove()
+			footer.children().remove()
+			var template=
+				'<div class="row">'+
+				'	<div class="col-sm-2" style="margin-top:20px"></div>'+
+				'	<div class="col-sm-8" style="margin-top:20px">'+
+				'		<div class="input-group">'+
+				'  			<span class="input-group-addon" id="basic-addon1">用户名</span>'+
+				'  			<input type="text"  name="name" class="form-control"/>'+
+				'		</div>'+
+				'	</div>'+
+				'</div>'+
+				'<div class="row">'+
+				'	<div class="col-sm-2" style="margin-top:20px"></div>'+
+				'	<div class="col-sm-8" style="margin-top:40px">'+
+				'		<div class="input-group">'+
+				'  			<span class="input-group-addon" id="basic-addon1">新密码：</span>'+
+				'  			<input type="text" name="password" class="form-control" />'+
+				'		</div>'+
+				'	</div>'+
+				'</div>'+
+				'<div class="row">'+
+				'	<div class="col-sm-2" style="margin-top:20px"></div>'+
+				'	<div class="col-sm-8" style="margin-top:40px">'+
+				'		<div class="input-group">'+
+				'  			<span class="input-group-addon" id="basic-addon1">确认密码：</span>'+
+				'  			<input type="text"  name="repassword" class="form-control" />'+
+				'		</div>'+
+				'	</div>'+
+				'	<div class="col-sm-1" style="margin-top:20px">'+
+				'			<h3><span style="margin-left:-27px"  class="label label-danger" id="wrong"></span></h3></div>'+
+				'</div>'+
+				'<div class="row">'+
+				'	<div class="col-sm-8 col-sm-offset-2" style="margin-top:40px">'+
+				'		<div class="input-group">' +
+				'					<div class="input-group-btn">' +
+				'						<button type="button"  class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+				'							选择权限<span class="caret"></span>' +
+				'						</button>' +
+				'						<ul class="dropdown-menu">' +
+				'							<li><a href="javascript:void(0)" role="listBtn1" list-value="超级管理员">超级管理员</a></li>' +
+				'							<li><a href="javascript:void(0)" role="listBtn2" list-value="政府人员">政府人员</a></li>' +
+				'						</ul>' + 
+				'					</div>' +
+				'					<input type="text" role="listBtnDisplay" value="超级管理员" name="authoritie" class="form-control" value="未选择" readonly="readonly"/>' +
+				'		</div>' +
+				'	</div>'+
+				'</div>'+
+				'<div class="row">'+
+				'	<div class="col-sm-2 col-sm-offset-5" style="margin-top:20px">'+
+				'			<h3><span style="margin-left:-27px"  class="label label-success" id="success"></span></h3>'+
+				'	</div>'+
+				'</div>'+
+				'<div class="row">'+
+				'	<div class="col-sm-2 col-sm-offset-5" style="margin-top:20px">'+
+				'		<input type="button" id="createname" class="btn btn-primary" value="确定新增"/>'+
+				'	</div>'+
+				'</div>'
+				body.append(template)
+				
+						//注册a标签监听，在选中后更改相关信息
+				regListBtn(modal.find("a[role='listBtn1']").parents(".input-group"),1, function() {});
+				regListBtn(modal.find("a[role='listBtn2']").parents(".input-group"),2, function() {});
+				
+				$("#createname").click(function(){
+					var name=$("input[name='name']").val()
+					var password=$("input[name='password']").val()
+					var repassword=$("input[name='repassword']").val()
+					var authoritie=$("input[name='authoritie']").val()
+					if(password==repassword){
+						$.ajax({
+							url: 'login/create',
+							type: 'POST',
+							async: true,
+							data:{
+								"username":name,
+								"password":password,
+								"authoritie":authoritie
+							},
+							dataType: 'json',
+							success: function(returndata) {
+								$("#success").html("创建成功")
+							},
+							error: function(returndata) {
+							}
+						})
+					}else{
+						$("#wrong").html("密码不正确")
+					}
+
+				})
+		})
+		
+		$("#modalDiaglog").on('hide.bs.modal', function () {
+			window.location.reload()
+		})
+		
 })

@@ -8,6 +8,21 @@
 	<select id="getUsers" parameterType="String"  resultType="myUser">
 		select * from users where username=#{username}
 	</select>
+	
+	<select id="getUsersCount" parameterType="String"  resultType="Integer">
+		select count(*) from users where 1=1 
+		<if test="username!=null">
+			and username like  concat(concat('%',#{username}),'%')
+		</if>
+	</select>
+	
+	<select id="getUsersById" parameterType="String"  resultType="myUser">
+		select * from users where 1=1 
+		<if test="username!=null">
+			and username like concat(concat('%',#{username}),'%')
+		</if>
+	</select>
+	
 
 	<select id="getAuthorities" parameterType="String"  resultType="String">
 		select authority from authorities where username=#{username}
@@ -16,5 +31,29 @@
 	<update id="updateAccountNonLocked"  parameterType="String">
 		update users set accountNonLocked=0 where username=#{username}
 	</update>
+	
+	<update id="updateunlock"  parameterType="String">
+		update users set accountNonLocked=1 where username=#{username}
+	</update>
+	
+	<update id="updatePassword"  parameterType="myUser">
+		update users set password=#{user.password} where username=#{user.username}
+	</update>
+	
+	
+	<delete id="deleteUser" parameterType="String">
+		delete from users where username=#{username}
+	</delete>
+	
+	<insert id="insertUser" parameterType="myUser">
+		insert into users values(#{user.username},#{user.password},1,1,1,1)
+	</insert>
+	
+	<insert id="insertAuthoritie" parameterType="java.util.Map">
+	   <foreach item="value" index="key" collection="map" separator=";" >
+  			insert into authorities values(#{key},#{value})
+    	</foreach>
+		
+	</insert>
 
 </mapper>
